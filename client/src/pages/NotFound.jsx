@@ -1,59 +1,40 @@
-import React, { useEffect } from "react";
-import Containar from "../layouts/Containar";
+// import Containar from "../components/containar/Containar";
 import { Link } from "react-router-dom";
-import { LuChevronRight } from "react-icons/lu";
+import notFound from "../assets/404/404.png";
+import { FaArrowRight } from "react-icons/fa";
+import image from "../assets/404/404.gif";
+import Containar from "../components/containar/Containar";
 
 const NotFound = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   return (
-    <div className="font-inter">
-      <div>
-        <div className="border-b border-b-border">
-          <Containar>
-            <h3 className="flex gap-x-2 py-5 items-center text-sm">
-              <Link className="inline-block" to={"/"}>
-                Home
-              </Link>{" "}
-              <span>
-                <LuChevronRight className="text-sm" />
-              </span>{" "}
-              <Link className="inline-block" to={"/"}>
-                Error 404
-              </Link>
+    <div className="font-robo tracking-wide">
+      <div className="h-[69px] sm:h-[89.4px] bg-primary"></div>
+      <Containar>
+        <div className="min-h-screen bg-cover bg-center flex items-center justify-center">
+          <div className="relative">
+            <h3 className="text-[120px] text-center absolute left-1/2 -top-10 -translate-x-1/2 z-20 ">
+              404
             </h3>
-          </Containar>
-        </div>
-        <div>
-          <Containar>
-            <div className="py-20">
-              <h2 className="text-[200px] text-texthead font-medium text-center">
-                404
-              </h2>
-              <h2 className="text-xl text-texthead font-medium text-center">
-                Woops, looks like this page does not exist
-              </h2>
-              <p className="text-center mt-3">
-                You could either go back or go to homepage
-              </p>
-              <p className="text-center mt-3">
-                
-                  Developed by <span className="font-medium"><Link target="_blanck" to={"https://www.okobiz.com/"}>okobiz</Link></span>
-                
-              </p>
-              <div className="mt-5 flex justify-center">
-                <Link
-                  to={"/"}
-                  className=" text-center mt-5 inline-block cursor-pointer py-4 px-16 bg-texthead text-white"
-                >
-                  Go Back
-                </Link>
-              </div>
+            <div>
+              <img className="-z-20" src={image} />
             </div>
-          </Containar>
+            <div className="text-center absolute bottom-10 left-1/2 -translate-x-1/2">
+              <h3 className="text-[20px]">Look like you're lost</h3>
+
+              <p className="mt-2 mb-6">
+                the page you are looking for not avaible!
+              </p>
+
+              <Link
+                to={"/"}
+                className="px-6 py-2 bg-primary text-white rounded-md "
+              >
+                Go to Home
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      </Containar>
     </div>
   );
 };

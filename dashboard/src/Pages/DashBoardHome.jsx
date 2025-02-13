@@ -1,120 +1,263 @@
-import React, { useState, useEffect } from "react";
-import { LiaFileInvoiceSolid } from "react-icons/lia";
-import { TbBasketCancel } from "react-icons/tb";
-import { MdOutlineSell } from "react-icons/md";
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  message,
+  Popconfirm,
+} from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import axiosInstance from "../Components/Axios";
 
-import { Alert, Calendar } from "antd";
-import axios from "../Components/Axios";
-import dayjs from "dayjs";
-import CountUp from "react-countup";
+const { Option } = Select;
 
-const Home = () => {
-  const [value, setValue] = useState(() => dayjs());
-  const [selectedValue, setSelectedValue] = useState(() => dayjs());
-  const [totalOrders, setTotalOrders] = useState(0);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [totalSales, setTotalSales] = useState(0);
+const AllUsers = () => {
+  const [users, setUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch Total Delivered Orders
-    const fetchTotalOrders = async () => {
-      try {
-        const response = await axios.get("/order");
-        const deliveredOrders = response.data.data.doc.filter((order) =>
-          dayjs(order.createdAt).isSame(value, "month")
-        );
-        setTotalOrders(deliveredOrders.length);
-        // console.log(response);
-      } catch (error) {
-        console.error("Error fetching total orders:", error);
-      }
-    };
+    fetchUsers();
+  }, []);
 
-    // Fetch Total Products
-    const fetchTotalProducts = async () => {
-      try {
-        const response = await axios.get("/varient");
-        setTotalProducts(response.data.data.doc.length);
-      } catch (error) {
-        console.error("Error fetching total products:", error);
-      }
-    };
-
-    // Fetch Total Sales
-    const fetchTotalSales = async () => {
-      try {
-        const response = await axios.get("/order");
-        const salesThisMonth = response.data.data.doc
-          .filter((order) => dayjs(order.createdAt).isSame(value, "month"))
-          .reduce((acc, order) => acc + order.totalCost, 0);
-        setTotalSales(salesThisMonth);
-      } catch (error) {
-        console.error("Error fetching total sales:", error);
-      }
-    };
-
-    fetchTotalOrders();
-    fetchTotalProducts();
-    fetchTotalSales();
-  }, [value]);
-
-  const onSelect = (newValue) => {
-    setValue(newValue);
-    setSelectedValue(newValue);
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get("/users");
+      setUsers(response.data.data.doc);
+    } catch (error) {
+      message.error("Failed to fetch users.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onPanelChange = (newValue) => {
-    setValue(newValue);
+  const showEditModal = (user) => {
+    setEditingUser(user);
+    form.setFieldsValue({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      verified: user.verified,
+    });
+    setIsModalVisible(true);
   };
+
+  const handleEdit = async () => {
+    try {
+      const values = await form.validateFields();
+      const response = await axiosInstance.patch(
+        `/users/${editingUser._id}`,
+        values
+      );
+
+      if (response.data.status === "success") {
+        message.success("User updated successfully!");
+        setIsModalVisible(false);
+        fetchUsers();
+      }
+    } catch (error) {
+      message.error("Failed to update user.");
+    }
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      const response = await axiosInstance.delete(`/users/${userId}`);
+
+      if (response.data.status === "success") {
+        message.success("User deleted successfully!");
+        fetchUsers();
+      }
+    } catch (error) {
+      message.error("Failed to delete user.");
+    }
+  };
+
+  const columns = [
+    {
+      title: "Photo",
+      dataIndex: "photo",
+      key: "photo",
+      render: (photo) =>
+        photo ? (
+          <img src={photo} alt="User" className="w-10 h-10 rounded-full" />
+        ) : (
+          <img
+            src={
+              "https://simplydoorsandwindows.com.au/wp-content/uploads/2014/08/avatar-person-neutral-man-blank-face-buddy.png"
+            }
+            alt="User"
+            className="w-10 h-10 rounded-full"
+          />
+        ),
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Date of Birth",
+      dataIndex: "dateOfBirth",
+      key: "dateOfBirth",
+      render: (dateOfBirth) =>
+        dateOfBirth ? new Date(dateOfBirth).toLocaleDateString() : "N/A",
+    },
+
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+    },
+    {
+      title: "Street Address",
+      dataIndex: "streetAddress",
+      key: "streetAddress",
+    },
+    {
+      title: "Shop Address",
+      dataIndex: "shopAddress",
+      key: "shopAddress",
+    },
+    {
+      title: "Upazilla",
+      dataIndex: "upazilla",
+      key: "upazilla",
+    },
+    {
+      title: "District",
+      dataIndex: "district",
+      key: "district",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+    },
+    {
+      title: "Verified",
+      dataIndex: "verified",
+      key: "verified",
+      render: (verified) => (verified ? "Yes" : "No"),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (text, record) => (
+        <>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => showEditModal(record)}
+            className="mr-2"
+          />
+          <Popconfirm
+            title="Are you sure to delete this user?"
+            onConfirm={() => handleDelete(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </>
+      ),
+    },
+  ];
 
   return (
-    <>
-      <div className="flex gap-x-5 md:flex-row flex-col justify-evenly py-10 gap-y-5">
-        <div className="text-black font-semibold text-base bg-[#DBEAFE] p-5 md:w-[20%] rounded-md text-center flex items-center gap-x-2 md:justify-center flex-col">
-          <div className="bg-[#2A68BC] p-3 rounded-full">
-            <LiaFileInvoiceSolid size="25" className="text-white" />
-          </div>
-          <h2>Total Order</h2>
-          <h3 className="font-bold text-xl">
-            <CountUp end={totalOrders} duration={2} separator="," />
-          </h3>
-          <p>From the running month</p>
-        </div>
-
-        <div className="text-black font-semibold text-base bg-[#F3E8FF] p-5 md:w-[20%] rounded-md text-center flex items-center gap-x-2 justify-center flex-col">
-          <div className="bg-[#2A68BC] p-3 rounded-full">
-            <TbBasketCancel size="25" className="text-white" />
-          </div>
-          <h2>Total Product</h2>
-          <h3 className="font-bold text-xl">
-            <CountUp end={totalProducts} duration={2} separator="," />
-          </h3>
-          <p>From the running month</p>
-        </div>
-
-        <div className="text-black font-semibold text-base bg-[#D2F4EE] p-5 md:w-[20%] rounded-md text-center flex items-center gap-x-2 justify-center flex-col">
-          <div className="bg-[#2A68BC] p-3 rounded-full">
-            <MdOutlineSell size="25" className="text-white" />
-          </div>
-          <h2>Total Sales</h2>
-          <h3 className="font-bold text-xl">
-            <CountUp end={totalSales} duration={2} separator="," /> Taka
-          </h3>
-          <p>From the running month</p>
-        </div>
-      </div>
-      <Alert
-        message={`You selected date: ${selectedValue?.format("YYYY-MM-DD")}`}
+    <div className="container mx-auto py-5">
+      <h1 className="text-2xl font-bold mb-4  mx-auto w-full text-center">
+        All Users
+      </h1>
+      <Table
+        columns={columns}
+        dataSource={users}
+        rowKey="_id"
+        loading={loading}
+        scroll={{ x: 'max-content' }}
       />
-      <div className="mt-6">
-        <Calendar
-          value={value}
-          onSelect={onSelect}
-          onPanelChange={onPanelChange}
-        />
-      </div>
-    </>
+
+      {/* Edit Modal */}
+      <Modal
+        title="Edit User"
+        visible={isModalVisible}
+        onOk={handleEdit}
+        onCancel={() => setIsModalVisible(false)}
+        okText="Save"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[
+              { required: true, message: "Please input the user's name!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Please input the user's email!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="phone"
+            label="Phone"
+            rules={[
+              {
+                required: true,
+                message: "Please input the user's Phone Number!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="role"
+            label="Role"
+            rules={[
+              { required: true, message: "Please select the user's role!" },
+            ]}
+          >
+            <Select>
+              <Option value="admin">Admin</Option>
+              <Option value="user">User</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="verified"
+            label="Verified"
+            rules={[{ required: true }]}
+          >
+            <Select>
+              <Option value={true}>Yes</Option>
+              <Option value={false}>No</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
 };
 
-export default Home;
+export default AllUsers;

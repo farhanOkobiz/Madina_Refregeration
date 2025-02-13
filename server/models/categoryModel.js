@@ -7,8 +7,8 @@ const categorySchema = new Schema(
     title: {
       type: String,
       required: [true, "Category title is required"],
-      trim: true,
       unique: true,
+      trim: true,
     },
 
     isActive: {
@@ -16,25 +16,16 @@ const categorySchema = new Schema(
       default: true,
     },
 
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+
     slug: {
       type: String,
     },
-
-    photos: [
-      {
-        type: String,
-        required: [true, "Photo is required"],
-        trim: true,
-      },
-    ],
-
-    subCategories: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "SubCategory",
-        require:[true,"Subcategory is required"]
-      },
-    ],
   },
   {
     timestamps: true,
@@ -42,9 +33,14 @@ const categorySchema = new Schema(
 );
 
 categorySchema.pre("save", function (next) {
-  this.slug = slugify(this.title, { lower: true });
+  if (this.isModified("title")) {
+    // this.slug = slugify(this.title, { lower: true });
+    this.title = this.title.toLowerCase();
+  }
+
   next();
 });
 
-const Category = model("Category", categorySchema);
-module.exports = Category;
+const category = model("Category", categorySchema);
+
+module.exports = category;

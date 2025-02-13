@@ -1,101 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, message } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../Components/Axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { activeUser } from "../Slices/userSlices";
+
 const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const selectore = useSelector((state) => state);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // console.log(selectore?.users?.userValue?.data?.user?.email);
-    if (selectore?.users?.status == "You are logged in successfully") {
-      return navigate("/dashboard");
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
     }
-    if (
-      selectore?.users?.userValue?.data?.user?.email == undefined ||
-      selectore?.users?.userValue?.data?.user?.email == null
-    ) {
-      return navigate("/");
-    }
-  }, []);
+  }, [navigate]);
 
   const onFinish = async (values) => {
-    setLoading(true);
     try {
-      const response = await axios.post("/auth/login", values);
+      const response = await axios.post("/auth/login", {
+        emailOrPhone: values.email,
+        password: values.password,
+      });
+      if (response.data.status === "success") {
+        const {
+          token,
+          data: { user },
+        } = response.data;
 
-      localStorage.setItem("user", JSON.stringify(response.data));
-      dispatch(activeUser(response?.data));
-      // console.log(response?.data?.data?.user?.role);
-
-      setTimeout(() => {
-        if (response?.data?.data?.user?.role === "aklogicAdmin") {
-          return navigate("/dashboard");
-        } else {
-          navigate("/");
+        // Check if the user is an admin
+        if (user.role !== "admin") {
+          message.error("You do not have admin access.");
+          return;
         }
-      }, 1000);
 
-      message.success("Login successfully");
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        dispatch(activeUser({ token, user }));
+
+        navigate("/dashboard");
+        message.success("Login successful!");
+      } else {
+        message.error("Login failed! Please check your credentials.");
+      }
     } catch (error) {
-      message.error("Auth Error");
-    } finally {
-      setLoading(false);
+      console.error("Login error:", error);
+      message.error("An error occurred during login. Please try again.");
     }
   };
+
   return (
     <div className="flex justify-center flex-col items-center h-screen">
-      <div className="md:w-[500px] mx-auto border p-10 rounded-md">
-        <h1 className="text-2xl my-2">Login</h1>
+      <div className="md:w-[500px] mx-auto border p-10 mb-16 rounded-md">
+        <h1 className="text-2xl my-2 mb-5">Login</h1>
         <Form
           name="normal_login"
           className="login-form"
-          initialValues={{
-            remember: true,
-          }}
+          initialValues={{ remember: true }}
           onFinish={onFinish}
         >
           <Form.Item
             name="email"
-            rules={[
-              {
-                required: true,
-                message: "Please input your email!",
-              },
-            ]}
+            rules={[{ required: true, message: "Please input your email!" }]}
           >
             <Input
               prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="email"
+              placeholder="Email"
             />
           </Form.Item>
           <Form.Item
             name="password"
-            rules={[
-              {
-                required: true,
-                message: "Please input your Password!",
-              },
-            ]}
+            rules={[{ required: true, message: "Please input your Password!" }]}
           >
             <Input
               prefix={<LockOutlined className="site-form-item-icon" />}
               type="password"
               placeholder="Password"
             />
-          </Form.Item>
-          <Form.Item>
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-
-            <a className="login-form-forgot text-primary" href="">
-              Forgot password
-            </a>
           </Form.Item>
           <Form.Item>
             <Button
@@ -105,14 +88,21 @@ const Login = () => {
             >
               Log in
             </Button>
-            Or{" "}
-            <a className="text-primary" href="">
-              register now!
-            </a>
           </Form.Item>
         </Form>
       </div>
+      <h1>
+        Developed by{" "}
+        <Link
+          className="font-bold text-black mt-10"
+          target="_blank"
+          to={"https://okobiz.com"}
+        >
+          okobiz
+        </Link>
+      </h1>
     </div>
   );
 };
+
 export default Login;

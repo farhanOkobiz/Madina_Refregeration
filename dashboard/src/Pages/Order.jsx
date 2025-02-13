@@ -1,300 +1,399 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Space,
   Table,
   Button,
-  message,
   Modal,
-  Form,
-  Input,
   Select,
+  message,
+  Popconfirm,
+  Tooltip,
 } from "antd";
-import axios from "../Components/Axios";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import axiosInstance from "../Components/Axios";
+import logoImage from "../../src/assets/logo.png";
 
-const Order = () => {
-  const [data, setData] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentOrder, setCurrentOrder] = useState(null);
-  const [form] = Form.useForm();
+const Orders = () => {
+  const [orders, setOrders] = useState([]);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [bankDetailsModal, setBankDetailsModal] = useState({
+    visible: false,
+    details: null,
+  });
 
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.get("/order");
-      const orders = response.data.data.doc;
-      // console.log("Fetched Orders:", orders);
-      setData(orders);
-      setFilteredData(orders); // Default to all orders
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+
 
   useEffect(() => {
     fetchOrders();
   }, []);
 
-  const handleSearch = () => {
-    const trimmedSearchTerm = searchTerm.trim();
-
-    const filtered = data?.filter((order) => {
-      const orderIdMatch = order?._id
-        .slice(-6)
-        ?.toLowerCase()
-        .includes(trimmedSearchTerm?.toLowerCase());
-      const phoneMatch = order.phone
-        ?.toLowerCase()
-        .includes(trimmedSearchTerm.toLowerCase());
-      return orderIdMatch || phoneMatch;
-    });
-
-    setFilteredData(filtered);
-  };
-
-  const handleEdit = (record) => {
-    setCurrentOrder(record);
-    form.setFieldsValue({
-      ...record,
-      colorName: record.products?.[0]?.option?.variant?.colorName || "",
-    });
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (id) => {
+  const fetchOrders = async () => {
+    setLoading(true);
     try {
-      await axios.delete(`/order/${id}`);
-      message.success("Order deleted successfully");
+      const { data } = await axiosInstance.get("/orders");
+      setOrders(data.data.doc);
+    } catch (error) {
+      message.error("Failed to fetch orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOk = async () => {
+    setLoading(true);
+    try {
+      await axiosInstance.patch(`/orders/${editingOrder._id}`, {
+        orderStatus: editingOrder.orderStatus,
+      });
+      message.success("Order status updated successfully!");
+      fetchOrders();
+      setIsModalOpen(false);
+    } catch (error) {
+      message.error("Failed to update order status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (orderId) => {
+    setLoading(true);
+    try {
+
+      await axiosInstance.delete(`/orders/${orderId}`);
+      message.success("Order deleted successfully!");
       fetchOrders();
     } catch (error) {
       message.error("Failed to delete order");
-      console.error("Error deleting order:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleUpdate = async (values) => {
-    try {
-      const updatedProducts = currentOrder.products.map((product) => {
-        return {
-          ...product,
-          option: {
-            ...product.option,
-            variant: {
-              ...product.option.variant,
-              colorName: values.colorName,
-            },
-          },
-        };
-      });
+  // const handlePrintInvoice = (order) => {
+  //   const iframe = document.createElement("iframe");
+  //   document.body.appendChild(iframe);
+  //   const doc = iframe.contentWindow.document;
 
-      await axios.patch(`/order/${currentOrder?._id}`, {
-        ...values,
-        products: updatedProducts,
-      });
+  //   const bankDetailsContent =
+  //     order.paymentMethod === "Bank" && order.bankDetails
+  //       ? `
+  //       <div class="bank-details">
+  //         <h4>Bank Details:</h4>
+  //         <div style="{display:flex}">
+  //           <p><strong>Bank Name:</strong> ${order.bankDetails?.bank}</p>
+  //           <p><strong>Method:</strong> ${order.bankDetails?.method}</p>
+  //           <p><strong>Account Name:</strong> ${
+  //             order.bankDetails?.accountName
+  //           }</p>
+  //           <p><strong>Account Number:</strong> ${
+  //             order.bankDetails?.accountNumber
+  //           }</p>
 
-      message.success("Order updated successfully");
-      setIsModalVisible(false);
-      fetchOrders();
-    } catch (error) {
-      message.error("Failed to update order");
-      console.error("Error updating order:", error);
-    }
-  };
+  //           <p><strong>Date of payment:</strong> ${new Date(
+  //             order.bankDetails?.dateOfPayment
+  //           ).toLocaleString()}</p>
+  //           <p><strong>Bank Reference:</strong> ${
+  //             order.bankDetails?.bankReference
+  //           }</p>
+  //           <p><strong>Promo:</strong> ${order.bankDetails?.promo}</p>
+  //           <p><strong>Cheque Submission Date:</strong> ${new Date(
+  //             order.bankDetails?.chequeSubmissionDate
+  //           ).toLocaleString()}</p>
+  //         </div>
+  //       </div>
+  //     `
+  //       : "";
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      await axios.patch(`/order/${orderId}`, { orderStatus: newStatus });
-      message.success("Order status updated successfully");
-      fetchOrders();
-    } catch (error) {
-      message.error("Failed to update order status");
-      console.error("Error updating order status:", error);
-    }
-  };
+  //   const invoiceContent = `
+  //   <html>
+  //     <head>
+  //       <title>'</title>
+  //       <style>
+  //         body { font-family: Arial, sans-serif; padding: 20px; margin: 0; }
+  //         .invoice-header { text-align: center; margin-bottom: 20px; }
+  //         h2 { margin: 0; font-size: 1.5rem; }
+  //         .order-details, .product-details { margin-bottom: 20px; }
+  //         .order-details p, .product-details p { margin: 0; font-size: 1rem; }
+  //         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  //         table, th, td { border: 1px solid #ccc; }
+  //         th, td { padding: 10px; text-align: left; }
+  //         th { background-color: #f4f4f4; }
+  //         img { max-width: 50px; margin-right: 5px; }
+  //         .total-cost { text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 20px; }
+  //         .bank-details { margin-top: 20px; }
+  //       </style>
+  //     </head>
+  //     <body>
+  //       <div class="invoice-header">
+  //         <img src=${logoImage} alt="Company Logo" />
+  //       <div>
+  //       <p>Agro Infusion Limited</p>
+  //       <p>+88 01890011810</p>
+  //       </div>
+  //         <h2 style="text-align: left;">Order Invoice</h2>
+  //         <p style="text-align: left;">Order ID: ${order._id.slice(0, 6)}</p>
+  //       </div>
+  //       <div class="order-details">
+  //       <div>
+  //       <p><strong>Customer:</strong> ${order.name}</p>
+  //       <p><strong>Email:</strong> ${order.email}</p>
+  //       <p><strong>Phone:</strong> ${order.phone}</p>
+  //       <p><strong>Address:</strong> ${order.streetAddress}, ${order.area}, ${
+  //     order.upazilla
+  //   }, ${order.district}, ${order.postCode}</p>
+  //       <p><strong>Order Status:</strong> ${order.orderStatus}</p>
+  //       <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
+  //       <p><strong>Total Cost:</strong> ${order.totalCost} TK.</p>
+  //       </div>
+  //       </div>
+  //       <div class="product-details">
+  //         <h3>Products</h3>
+  //         <table>
+  //           <thead>
+  //             <tr>
+  //               <th>Title</th>
+  //               <th>Size</th>
+  //               <th>Quantity</th>
+  //               <th>Price</th>
+  //               <th>Photos</th>
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //             ${order.products
+  //               .map(
+  //                 (productItem) => `
+  //               <tr>
+  //                 <td>${productItem.product.title}</td>
+  //                 <td>${productItem.product.size}</td>
+  //                 <td>${productItem.quantity}</td>
+  //                 <td>${productItem.product.salePrice}</td>
+  //                 <td>${productItem.product.photos
+  //                   .map(
+  //                     (photo) => `<img src="${photo}" alt="Product Photo" />`
+  //                   )
+  //                   .join("")}</td>
+  //               </tr>
+  //             `
+  //               )
+  //               .join("")}
+  //           </tbody>
+  //         </table>
+  //       </div>
+  //       ${bankDetailsContent}
+  //       <div class="total-cost">
+  //         <p>Total: ${order.totalCost} ${order.transactionDetails.currency}</p>
+  //       </div>
+  //     </body>
+  //   </html>
+  // `;
 
-  const handleCourierChange = async (order, courier) => {
-    if (courier === "Steadfast") {
-      try {
-        const { name, phone, streetAddress, city, zone, area, totalCost } =
-          order;
-        const invoice = `${order._id.slice(-6)}`;
+  //   doc.open();
+  //   doc.write(invoiceContent);
+  //   doc.close();
+  //   iframe.contentWindow.onafterprint = () => {
+  //     document.body.removeChild(iframe);
+  //   };
 
-        const payload = {
-          invoice,
-          recipient_name: name,
-          recipient_phone: phone,
-          recipient_address: `${streetAddress}, ${area.areaName}, ${city.cityName}, ${zone.zoneName} `,
-          cod_amount: totalCost,
-        };
+  //   iframe.onload = () => {
+  //     iframe.contentWindow.focus();
+  //     iframe.contentWindow.print();
 
-        const response = await axios.post(
-          "https://portal.packzy.com/api/v1/create_order",
-          payload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Api-Key": "s3lkad69rg4wxsalb8prvgju1btblu77",
-              "Secret-Key": "tmavaud43uu1rkk2rszo0sip",
-            },
-          }
-        );
+  //     iframe.contentWindow.onafterprint = () => {
+  //       document.body.removeChild(iframe);
+  //     };
+  //   };
+  // };
 
-        if (response?.data?.status === 200) {
-          return message.success("Order placed with Steadfast successfully");
-        }
-        if (response?.data?.status === 400) {
-          return message.error(response?.data?.errors.invoice);
-        }
-      } catch (error) {
-        message.error("Error placing order with Steadfast");
-        console.error("Error placing Steadfast order:", error);
-      }
-    }
-    if (courier === "pathao") {
-      try {
-        const { name, phone, streetAddress, city, zone, area, totalCost } =
-          order;
+  const handlePrintInvoice = (order) => {
+    const iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+    const doc = iframe.contentWindow.document;
 
-        const payload = {
-          merchant_order_id: order._id,
-          recipient_name: name,
-          recipient_phone: phone,
-          recipient_city: city.cityID,
-          recipient_zone: zone.zoneID,
-          delivery_type: 48,
-          item_type: 2,
-          item_quantity: order.products[0].quantity,
-          item_weight: 0.5,
-          amount_to_collect: totalCost,
-          recipient_address: `${streetAddress}, ${area.areaName}, ${city.cityName}, ${zone.zoneName} `,
-        };
-
-        // Ensure you're sending the correct base URL
-        const response = await axios.post(
-          "/pathaoLocation/create-order",
-          payload
-        );
-
-        // Update response checks to match the API response structure
-        if (response?.data?.status === "success") {
-          return message.success("Order placed with Pathao successfully"); // Ensure correct success message
-        }
-        if (response?.data?.status === "fail") {
-          return message.error(
-            response?.data?.message || "Failed to place order with Pathao"
-          );
-        }
-      } catch (error) {
-        message.error("Error placing order with Pathao");
-        console.error("Error placing pathao order:", error);
-      }
-    }
-  };
-
-  const handlePrintInvoice = async (order) => {
-    try {
-      const response = await axios.get(`/order/${order._id}`);
-      const anOrder = response?.data?.data?.doc;
-
-      const invoiceWindow = window.open("", "_blank");
-
-      const invoiceHTML = `
-        <html>
-          <head>
-            <title>Invoice</title>
-            <style>
-              body { font-family: Arial, sans-serif; }
-              .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
-              .invoice-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-              .invoice-header h1 { margin: 0; }
-              .invoice-details { margin-bottom: 20px; }
-              .invoice-details p { margin: 0; }
-              .invoice-products { width: 100%; border-collapse: collapse; }
-              .invoice-products th, .invoice-products td { border: 1px solid #eee; padding: 10px; }
-              .invoice-total { margin-top: 20px; text-align: right; font-weight: bold; }
-            </style>
-          </head>
-          <body>
-            <div class="invoice-box">
-              <div class="invoice-header">
-                <h1>Invoice</h1>
-                <div>
-                  <p>Order ID: ${anOrder._id.slice(-6)}</p>
-                  <p>Date: ${new Date(
-                    anOrder.createdAt
-                  ).toLocaleDateString()}</p>
+    const invoiceContent = `
+          <html>
+            <head>
+              <title>Invoice</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  margin: 40px;
+                  color: #333;
+                }
+                .header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 30px;
+                }
+                .header .logo {
+                  font-size: 2rem;
+                  font-weight: bold;
+                }
+                .header .invoice-title {
+                  font-size: 1.5rem;
+                  font-weight: bold;
+                }
+                .billing-section {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 20px;
+                }
+                .billing-info p, .order-info p {
+                  margin: 5px 0;
+                }
+                table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-bottom: 20px;
+                }
+                th, td {
+                  border: 1px solid #ccc;
+                  padding: 10px;
+                  text-align: left;
+                }
+                th {
+                  background-color: #f9f9f9;
+                }
+                .summary {
+                  text-align: right;
+                }
+                .summary p {
+                  margin: 5px 0;
+                  font-size: 1rem;
+                }
+                .total {
+                  font-size: 1.2rem;
+                  font-weight: bold;
+                }
+                .thank-you {
+                  margin-top: 50px;
+                  font-size: 1rem;
+                }
+                .company-info {
+                   margin-bottom: 20px;
+                   font-size: 1rem;
+                }
+                .invoice-details {
+                  margin-top: 50px;
+                  font-size: 1rem;
+                  text-align: center;
+                  font-weight: bold;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <div class="logo">
+                  <img src="${logoImage}" alt="Company Logo" style="height: 50px;" />
+                </div>
+                <div class="invoice-title">INVOICE</div>
+              </div>
+    
+              <div class="invoice-details">
+                <p>Company Invoice</p>
+              </div>
+    
+              <div class="billing-section">
+                <div class="billing-info">
+                  <p<strong><b>COMPANY:</b></strong></p>
+                <p>Agro Infusion Limited</p>
+                <p>+88 01890011810</p>
+                <p>info@agroinfusion.com</p>
                 </div>
               </div>
-              <div class="invoice-details">
-                <p>Name: ${anOrder.name}</p>
-                <p>Phone: ${anOrder.phone}</p>
-                <p>Email: ${anOrder.email}</p>
-                
-                <p>Address:${anOrder.streetAddress}, ${
-        anOrder.area.areaName
-      }, ${anOrder.city.cityName}, ${anOrder.zone.zoneName} </p>
+    
+              <div class="billing-section">
+                <div class="billing-info">
+                  <p><strong>BILLED TO:</strong></p>
+                  <p>${order.name}</p>
+                  <p>${order.phone}</p>
+                  <p>${order.email}</p>
+                  <p>${order.streetAddress}, ${order.area}, ${order.upazilla
+      }, ${order.district}, ${order.postCode}</p>
+                </div>
+                <div class="order-info">
+                  <p><strong>Invoice No.:</strong> ${order._id.slice(0, 6)}</p>
+                  <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                  <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
+                </div>
               </div>
-              <table class="invoice-products">
+              
+              <table>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Color</th>
-                    <th>Size</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Item</th>
+                    <th>Quantity (kg)</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
                   </tr>
                 </thead>
                 <tbody>
-                  ${anOrder.products
-                    .map(
-                      (product) => `
+                  ${order.products
+        .map(
+          (product) => `
                       <tr>
-                        <td>${product?.option?.product?.name || "N/A"}</td>
-                        <td>${product?.option?.variant?.colorName || "N/A"}</td>
-                        <td>${product?.option?.size || "N/A"}</td>
-                        <td>${product?.quantity || "N/A"}</td>
-                        <td>${anOrder.totalCost || "N/A"}</td>
+                        <td>${product.product.title}</td>
+                        <td>${product.quantity}</td>
+                        <td>${product.product.salePrice} TK</td>
+                        <td>${product.quantity * product.product.salePrice
+            } TK</td>
                       </tr>
                     `
-                    )
-                    .join("")}
+        )
+        .join("")}
                 </tbody>
               </table>
-              <div class="invoice-total">
-                <p>Total Cost: ${anOrder.totalCost}</p>
+    
+              <div class="summary">
+                <p class="total"><strong>Grand Total:</strong> ${order.totalCost
+      } TK</p>
               </div>
-            </div>
-          </body>
-        </html>
-      `;
+    
+              <div class="thank-you">
+                <p><i>Thank you!</i></p>
+              </div>
+            </body>
+          </html>
+        `;
 
-      invoiceWindow.document.write(invoiceHTML);
-      invoiceWindow.document.close();
+    doc.open();
+    doc.write(invoiceContent);
+    doc.close();
 
-      invoiceWindow.onload = () => {
-        invoiceWindow.print();
-        invoiceWindow.close();
-      };
-    } catch (error) {
-      console.error("Error printing invoice:", error);
-    }
+    iframe.contentWindow.onafterprint = () => {
+      document.body.removeChild(iframe);
+    };
+
+    iframe.onload = () => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
+  };
+
+  const showModal = (record) => {
+    setEditingOrder(record);
+    setIsModalOpen(true);
+  };
+
+  const showBankDetails = (details) => {
+    setBankDetailsModal({ visible: true, details });
   };
 
   const columns = [
     {
-      title: "SR",
-      dataIndex: "index",
-      key: "sr",
-      render: (text, record, index) => <a>{index + 1}</a>,
+      title: "SL",
+      key: "sl",
+      render: (text, record, index) => index + 1,
     },
     {
       title: "Date",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (text) => new Date(text).toLocaleDateString(),
+      render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: "Order ID",
+      title: "Id",
       dataIndex: "_id",
       key: "_id",
       render: (text) => {
@@ -302,177 +401,192 @@ const Order = () => {
         return paddedText.slice(-6).padStart(6, "0");
       },
     },
-
     {
-      title: "Product Name",
-      dataIndex: ["products", 0, "option", "product", "name"],
-      key: "productName",
-      render: (text) => <a>{text || "N/A"}</a>,
+      width: "25%",
+      title: "Products",
+      dataIndex: "products",
+      key: "products",
+      render: (products) =>
+        products?.map((productItem) => (
+          <div key={productItem._id}>
+            <p>Title: {productItem.product?.title}</p>
+            <p>Size: {productItem.product?.size}</p>
+            <p>Quantity: {productItem?.quantity}</p>
+            <p>Price: {productItem.product?.salePrice}</p>
+            {productItem.product?.photos.map((photo, index) => (
+              <img
+                key={index}
+                src={photo}
+                alt="product"
+                style={{
+                  width: "50px",
+                  marginRight: "5px",
+                  display: "inline-block",
+                }}
+              />
+            ))}
+          </div>
+        )),
     },
     {
-      title: "Price",
-      dataIndex: "totalCost",
-      key: "totalCost",
-    },
-    {
-      title: "Quantity",
-      dataIndex: ["products", 0, "quantity"],
-      key: "quantity",
-    },
-
-    {
-      title: "Color Name",
-      dataIndex: ["products", 0, "option", "variant", "colorName"],
-      key: "colorName",
-    },
-    {
-      title: "Size",
-      dataIndex: ["products", 0, "option", "size"],
-      key: "size",
-    },
-    {
-      title: "Information",
-      dataIndex: "information",
-      key: "information",
+      width: "20%",
+      title: "Info",
+      key: "address",
       render: (text, record) => (
-        <div>
+        <>
           <p>Name: {record.name}</p>
           <p>Phone: {record.phone}</p>
           <p>Email: {record.email}</p>
-          <p>City: {record.city.cityName}</p>
           <p>
-            Address:{" "}
-            {`${record.streetAddress},${record.zone.zoneName}, ${record.area.areaName}`}
+            Address: {record.streetAddress}, {record.area}, {record.upazilla},
+            {record.district}, {record.postCode}
           </p>
-        </div>
+        </>
       ),
     },
     {
       width: "10%",
-      title: "Status",
-      dataIndex: "orderStatus",
-      key: "orderStatus",
-      render: (_, record) => (
-        <Select
-          className="w-[100%]"
-          value={record.orderStatus} // Show current status
-          onChange={(value) => handleStatusChange(record._id, value)}
-          options={[
-            { label: "Pending", value: "pending" },
-            { label: "Approved", value: "approved" },
-            { label: "Delivered", value: "delivered" },
-            { label: "Shipped", value: "shipped" },
-            { label: "Canceled", value: "canceled" },
-          ]}
-        />
-      ),
+      title: "Total Cost",
+      dataIndex: "totalCost",
+      key: "totalCost",
     },
     {
-      width: "15%",
-      title: "Courier Service",
-      dataIndex: "courier",
-      key: "courier",
-      render: (text, record) => (
-        <Select
-          className="w-[100%]"
-          value={record.courier || "Select Courier"} // Show selected courier
-          onChange={(value) => handleCourierChange(record, value)}
-          options={[
-            { label: "Steadfast", value: "Steadfast" },
-            { label: "pathao", value: "pathao" },
-          ]}
-        />
-      ),
+      width: "10%",
+      title: "Payment method",
+      dataIndex: "paymentMethod",
+      key: "paymentMethod",
+      render: (paymentMethod, record) =>
+        paymentMethod === "Bank" ? (
+          <span>
+            {paymentMethod}
+            <Tooltip title="View Bank Details">
+              <Button
+                type="link"
+                icon={<InfoCircleOutlined />}
+                onClick={() => showBankDetails(record.bankDetails)}
+              />
+            </Tooltip>
+          </span>
+        ) : (
+          paymentMethod
+        ),
     },
     {
-      title: "Actions",
-      key: "actions",
+      width: "10%",
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+    },
+
+    { title: "Order Status", dataIndex: "orderStatus", key: "orderStatus" },
+    {
+      width: "10%",
+      title: "Action",
+      key: "action",
       render: (text, record) => (
-        <Space size="middle">
-          <Button type="primary" onClick={() => handleEdit(record)}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <Button type="primary" onClick={() => showModal(record)}>
             Edit
           </Button>
-          <Button type="primary" onClick={() => handleDelete(record._id)}>
-            Delete
-          </Button>
-          <Button type="primary" onClick={() => handlePrintInvoice(record)}>
+          <Button type="default" onClick={() => handlePrintInvoice(record)}>
             Print Invoice
           </Button>
-        </Space>
+          <Popconfirm
+            title="Are you sure you want to delete this order?"
+            onConfirm={() => handleDelete(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger type="primary">
+              Delete
+            </Button>
+          </Popconfirm>
+        </div>
       ),
     },
   ];
 
   return (
-    <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Input
-          placeholder="Search by Order ID or Phone"
-          value={searchTerm}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSearchTerm(value);
-            if (value.trim() === "") {
-              setFilteredData([]);
-              fetchOrders();
-              return;
-            }
-          }}
-          style={{ width: 300 }}
-        />
-        <Button type="primary" onClick={handleSearch}>
-          Search
-        </Button>
-      </Space>
-
-      {/* Table displaying data */}
+    <>
       <Table
         columns={columns}
-        dataSource={filteredData || data} // Use filteredData if available, otherwise fallback to all data
-        rowKey={(record) => record._id}
-        pagination={{ pageSize: 10 }}
+        dataSource={orders}
+        rowKey="_id"
+        loading={loading}
       />
 
-      {/* Modal for editing order */}
       <Modal
-        title="Edit Order"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        title="Edit Order Status"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <Select
+          style={{ width: "100%" }}
+          value={editingOrder?.orderStatus}
+          onChange={(value) =>
+            setEditingOrder((prev) => ({
+              ...prev,
+              orderStatus: value,
+            }))
+          }
+        >
+          <Select.Option value="pending">Pending</Select.Option>
+          <Select.Option value="approved">Approved</Select.Option>
+          <Select.Option value="shipped">Shipped</Select.Option>
+          <Select.Option value="delivered">Delivered</Select.Option>
+          <Select.Option value="canceled">Canceled</Select.Option>
+        </Select>
+      </Modal>
+
+      <Modal
+        title="Bank Details"
+        open={bankDetailsModal.visible}
+        onCancel={() => setBankDetailsModal({ visible: false, details: null })}
         footer={null}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleUpdate}
-          initialValues={currentOrder}
-        >
-          <Form.Item label="Name" name="name">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Phone" name="phone">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Email" name="email">
-            <Input />
-          </Form.Item>
-          <Form.Item label="City" name="city">
-            <Input />
-          </Form.Item>
-          <Form.Item label="District" name="district">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Color Name" name="colorName">
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
+        <div>
+          <p>
+            <strong>Bank Name:</strong> {bankDetailsModal.details?.bank}
+          </p>
+          <p>
+            <strong>Method:</strong> {bankDetailsModal.details?.method}
+          </p>
+          <p>
+            <strong>Account Name:</strong>
+            {bankDetailsModal.details?.accountName}
+          </p>
+          <p>
+            <strong>Account Number:</strong>
+            {bankDetailsModal.details?.accountNumber}
+          </p>
+          <p>
+            <strong>Date of payment:</strong>{" "}
+            {new Date(bankDetailsModal.details?.dateOfPayment).toLocaleString()}
+          </p>
+          <p>
+            <strong>Cheque Submission Date:</strong>{" "}
+            {new Date(
+              bankDetailsModal.details?.chequeSubmissionDate
+            ).toLocaleString()}
+          </p>
+          <p>
+            <strong>Bank Reference:</strong>
+            {bankDetailsModal.details?.bankReference}
+          </p>
+          <p>
+            <strong>Promo:</strong> {bankDetailsModal.details?.promo}
+          </p>
+
+          <img
+            src={orders.find((order) => order.paymentMethod === "Bank")?.photo}
+            alt="Bank transaction"
+            style={{ maxWidth: "100%", marginTop: "10px" }}
+          />
+        </div>
       </Modal>
-    </div>
+    </>
   );
 };
 
-export default Order;
+export default Orders;

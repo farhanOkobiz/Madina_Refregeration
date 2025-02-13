@@ -7,16 +7,23 @@ const bannerSchema = new Schema(
       type: String,
       required: [true, "Title is required"],
       unique: true,
+      trim: true,
     },
 
     subTitle: {
       type: String,
       required: [true, "Sub-title is required"],
+      trim: true,
     },
 
     photo: {
       type: String,
       required: [true, "Photo is required"],
+    },
+
+    mediaType: {
+      type: String,
+      enum: ["image", "video"],
     },
 
     link: {
@@ -28,7 +35,7 @@ const bannerSchema = new Schema(
     bannerType: {
       type: String,
       enum: {
-        values: ["Main Banner", "Deals of the Week", "New Release"],
+        values: ["main", "deals", "newRelease"],
         message: "{VALUE} is not supported, Please provide valid banner type",
       },
       required: [true, "Banner type is required"],
@@ -39,11 +46,11 @@ const bannerSchema = new Schema(
       default: true,
     },
   },
-
   {
     timestamps: true,
   }
 );
 
 const Banner = model("Banner", bannerSchema);
+
 module.exports = Banner;

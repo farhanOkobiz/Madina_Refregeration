@@ -1,6 +1,6 @@
+const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const validator = require("validator");
-const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
@@ -9,6 +9,8 @@ const userSchema = new Schema(
     name: {
       type: String,
       required: [true, "Please tell us your name"],
+      minLength: [3, "Minimum length of name is 3 character"],
+      maxLength: [50, "Maximum length of name is 20 character"],
       trim: true,
     },
 
@@ -25,22 +27,66 @@ const userSchema = new Schema(
       trim: true,
     },
 
+    gender: {
+      type: String,
+      enum: {
+        values: ["male", "female", "other"],
+        message: "{VALUE} is not supported, Enter a valid gender",
+      },
+    },
+
     phone: {
       type: String,
+      trim: true,
       required: [true, "Phone number is required"],
       validate: {
-        validator: function (v) {
-          return validator.isMobilePhone(v);
+        validator: function (val) {
+          return /^(?:\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(val);
         },
-        message: (props) => `${props.value} is not a valid phone number!`,
+        message: "Please provide a valid phone number",
       },
+    },
+
+    district: {
+      type: String,
+      trim: true,
+    },
+
+    upazilla: {
+      type: String,
+      trim: true,
+    },
+
+    area: {
+      type: String,
+      trim: true,
+    },
+
+    postCode: {
+      type: String,
+      trim: true,
+    },
+
+    streetAddress: {
+      type: String,
+      trim: true,
+    },
+
+    shopAddress: {
+      type: String,
+      trim: true,
+    },
+
+    dateOfBirth: {
+      type: Date,
+      trim: true,
     },
 
     role: {
       type: String,
       enum: {
-        values: ["user", "aklogicAdmin"],
-        message: "{VALUE} is not supported",
+        values: ["user", "admin"],
+        message: "{VALUE} is not supported, Enter a valid role",
       },
       default: "user",
     },
@@ -63,17 +109,12 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Confirm your password please"],
       validate: {
-        // This only works on CREATE and SAVE!
         validator: function (val) {
           return val === this.password;
         },
-        message: "Password does not matched",
+        message: "Password does not matched properly",
       },
     },
-
-    passwordChangedAt: Date,
-    passwordResetToken: String,
-    passwordResetExpires: Date,
 
     active: {
       type: Boolean,
@@ -85,8 +126,14 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-  },
 
+    verificationToken: String,
+    verificationTokenExpires: String,
+
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+  },
   {
     timestamps: true,
   }
@@ -110,7 +157,6 @@ userSchema.pre("save", function (next) {
 
 // QUERY MIDDLEWARES:
 userSchema.pre(/^find/, function (next) {
-  // "this" points to the current query
   this.find({ active: { $ne: false } });
   next();
 });
@@ -144,8 +190,9 @@ userSchema.methods.createPasswordResetToken = function () {
     .digest("hex");
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // for 10 minutes of expire time
-  return this.passwordResetToken;
+  return resetToken;
 };
 
 const User = model("User", userSchema);
+
 module.exports = User;

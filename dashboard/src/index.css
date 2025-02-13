@@ -15,3 +15,8 @@
   width: 100%;
   display: block;
 }
+
+.list-item:last-child{border:none !important;}
+
+
+.optionse:last-child{border:none !important}

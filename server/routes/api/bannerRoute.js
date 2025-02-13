@@ -1,26 +1,41 @@
 const express = require("express");
-const {
-  createBannerController,
-  getAllBannerController,
-  getBannerController,
-  deleteBannerController,
-} = require("../../controllers/bannerController");
+const protectMiddleware = require("../../middlewares/protectMiddleware");
+const restrictToMiddleware = require("../../middlewares/restrictToMiddleware");
 const {
   uploadPhotoMiddleware,
-  resizePhotoMiddleware,
-} = require("../../middlewares/uploadPhotoMiddleware");
+  cloudinaryUploadMiddleware,
+} = require("../../middlewares/photoMiddleware");
+
+const {
+  getAllBannersController,
+  getBannerController,
+  createBannerController,
+  updateBannerController,
+  deleteBannerController,
+} = require("../../controllers/bannerController");
 
 const router = express.Router();
 
-router
-  .route("/")
-  .post(
-    uploadPhotoMiddleware(),
-    resizePhotoMiddleware("banner"),
-    createBannerController
-  )
-  .get(getAllBannerController);
+router.get("/", getAllBannersController);
+router.get("/:id", getBannerController);
 
-router.route("/:id").get(getBannerController).delete(deleteBannerController);
+router.use(protectMiddleware);
+router.use(restrictToMiddleware("admin"));
+
+router.post(
+  "/",
+  uploadPhotoMiddleware(),
+  cloudinaryUploadMiddleware("banner", "photo"),
+  createBannerController
+);
+
+router
+  .route("/:id")
+  .patch(
+    uploadPhotoMiddleware(),
+    cloudinaryUploadMiddleware("banner", "photo"),
+    updateBannerController
+  )
+  .delete(deleteBannerController);
 
 module.exports = router;

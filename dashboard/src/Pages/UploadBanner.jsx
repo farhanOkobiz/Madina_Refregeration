@@ -1,95 +1,123 @@
+import React, { useEffect, useState } from "react";
 import {
+  Table,
   Button,
-  Card,
-  Col,
+  Modal,
   Form,
   Input,
-  Row,
-  Select,
-  Space,
-  Table,
   Upload,
+  Select,
+  Switch,
+  Popconfirm,
   message,
 } from "antd";
-import React, { useState, useEffect } from "react";
-import axios from "../Components/Axios";
-import { UploadOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import axiosInstance from "../Components/Axios";
 
-const UploadBanner = () => {
-  const [brandForm] = Form.useForm();
+const { Option } = Select;
+
+const AllBanner = () => {
   const [banners, setBanners] = useState([]);
-  const [fileList, setFileList] = useState([]);
-
-  const fetchBanners = async () => {
-    try {
-      const response = await axios.get("/banner");
-
-      setBanners(response.data.data.doc);
-    } catch (error) {
-      console.error("Error fetching banners:", error);
-    }
-  };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [editingBanner, setEditingBanner] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchBanners();
   }, []);
 
-  const handleBrandSubmit = async (values) => {
+  const fetchBanners = async () => {
     try {
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("subTitle", values.subTitle);
-      formData.append("link", values.link);
-      formData.append("bannerType", values.bannerType);
-      if (fileList.length > 0) {
-        formData.append("photo", fileList[0]);
-      }
-
-      const response = await axios.post("/banner", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      message.success(response.data.message);
-      fetchBanners();
-      brandForm.resetFields();
-      setFileList([]);
+      const response = await axiosInstance.get("/banners");
+      setBanners(response.data.data.doc);
     } catch (error) {
-      message.error("Failed to add banner");
-      console.error("Error adding banner:", error);
+      message.error("Failed to fetch banners");
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleCreateBanner = async (values) => {
     try {
-      await axios.delete(`/banner/${id}`);
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("subTitle", values.subTitle);
+      formData.append("mediaType", values.mediaType);
+      formData.append("link", values.link);
+      formData.append("bannerType", values.bannerType);
+      formData.append("isActive", values.isActive);
+
+      // Only append the photo if it's being changed
+      if (values.photo && values.photo.file) {
+        formData.append("photo", values.photo.file);
+      }
+
+      if (editingBanner) {
+        await axiosInstance.patch(`/banners/${editingBanner._id}`, formData);
+        message.success("Banner updated successfully");
+      } else {
+        await axiosInstance.post("/banners", formData);
+        message.success("Banner created successfully");
+      }
+
+      setIsModalVisible(false);
+      fetchBanners();
+    } catch (error) {
+      message.error("Failed to save banner");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditBanner = (banner) => {
+    setEditingBanner(banner);
+    setIsModalVisible(true);
+    form.setFieldsValue({
+      ...banner,
+      isActive: banner.isActive,
+      photo: undefined, // Reset photo field to avoid showing previous photo file
+    });
+  };
+
+  const handleDeleteBanner = async (id) => {
+    try {
+      await axiosInstance.delete(`/banners/${id}`);
       message.success("Banner deleted successfully");
       fetchBanners();
     } catch (error) {
       message.error("Failed to delete banner");
-      console.error("Error deleting banner:", error);
     }
   };
 
   const columns = [
-    {
-      title: "Photo",
-      dataIndex: "photo",
-      key: "photo",
-      render: (text) => (
-        <img src={text} alt="banner" style={{ width: 50, height: 50 }} />
-      ),
-    },
     {
       title: "Title",
       dataIndex: "title",
       key: "title",
     },
     {
-      title: "Sub Title",
+      title: "SubTitle",
       dataIndex: "subTitle",
       key: "subTitle",
+    },
+    {
+      title: "Media",
+      dataIndex: "mediaType",
+      key: "mediaType",
+      render: (_, record) =>
+        record.mediaType === "image" ? (
+          <img
+            src={record.photo}
+            alt={record.title}
+            style={{ width: "100px" }}
+          />
+        ) : (
+          <video src={record.photo} controls style={{ width: "100px" }} />
+        ),
     },
     {
       title: "Link",
@@ -102,118 +130,117 @@ const UploadBanner = () => {
       key: "bannerType",
     },
     {
-      title: "Action",
-      key: "action",
+      title: "Active",
+      dataIndex: "isActive",
+      key: "isActive",
+      render: (isActive) => (isActive ? "Yes" : "No"),
+    },
+    {
+      title: "Actions",
+      key: "actions",
       render: (_, record) => (
-        <Space size="middle">
-          {/* <a>Edit</a> */}
-          <Button onClick={() => handleDelete(record._id)}>Delete</Button>
-        </Space>
+        <div>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEditBanner(record)}
+            style={{ marginRight: 8 }}
+          />
+          <Popconfirm
+            title="Are you sure to delete this banner?"
+            onConfirm={() => handleDeleteBanner(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </div>
       ),
     },
   ];
 
-  const uploadProps = {
-    fileList,
-    onRemove: (file) => {
-      setFileList((prevList) => {
-        const index = prevList.indexOf(file);
-        const newFileList = prevList.slice();
-        newFileList.splice(index, 1);
-        return newFileList;
-      });
-    },
-    beforeUpload: (file) => {
-      setFileList([file]);
-      return false;
-    },
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+    setEditingBanner(null);
   };
 
   return (
-    <>
-      <h2 className="text-center font-semibold md:text-2xl text-xl py-10 ">
-        Add Banner
-      </h2>
-      <Row gutter={16}>
-        <Col span={8}>
-          <Card title="Add Banner" bordered={false}>
-            <Form
-              form={brandForm}
-              onFinish={handleBrandSubmit}
-              layout="vertical"
-            >
-              <Form.Item
-                label="Banner Title"
-                name="title"
-                rules={[
-                  { required: true, message: "Please input the Banner name!" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                layout="vertical"
-                label="Sub Title"
-                name="subTitle"
-                rules={[
-                  { required: true, message: "Please input the Sub Title!" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                layout="vertical"
-                label="Product Link"
-                name="link"
-                rules={[
-                  { required: true, message: "Please input the Product Link!" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                layout="vertical"
-                label="Banner Type"
-                name="bannerType"
-                rules={[
-                  { required: true, message: "Please select a Banner Type!" },
-                ]}
-              >
-                <Select
-                  style={{ width: "100%" }}
-                  options={[
-                    { label: "Main Banner", value: "Main Banner" },
-                    { label: "Deals of the Week", value: "Deals of the Week" },
-                    { label: "New Release", value: "New Release" },
-                  ]}
-                />
-              </Form.Item>
-              <Form.Item label="Upload Banner Image">
-                <p className="text-xs text-gray-500  py-2">
-                  {" "}
-                  Main Banner= 690 x 360px, New Release= 468 x 752px, Deals of
-                  the Week= 402 x 706px
-                </p>
+    <div>
+      <div className="flex justify-between mb-4">
+        <h1 className="text-2xl font-bold">All Banners</h1>
+        <Button
+          type="primary"
+          onClick={() => setIsModalVisible(true)}
+          style={{ marginBottom: 16 }}
+        >
+          Add New Banner
+        </Button>
+      </div>
 
-                <Upload {...uploadProps}>
-                  <Button icon={<UploadOutlined />}>Upload Banner Image</Button>
-                </Upload>
-              </Form.Item>
-              <br />
-              <Button type="primary" htmlType="submit">
-                Add Banner
+      <Table dataSource={banners} columns={columns} rowKey="_id" />
+
+      <Modal
+        title={editingBanner ? "Edit Banner" : "Create Banner"}
+        visible={isModalVisible}
+        onCancel={handleModalCancel}
+        footer={null}
+      >
+        <Form form={form} onFinish={handleCreateBanner} layout="vertical">
+          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="subTitle"
+            label="Sub-Title"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="mediaType"
+            label="Media Type"
+            rules={[{ required: true }]}
+          >
+            <Select>
+              <Option value="image">Image</Option>
+              <Option value="video">Video</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="link" label="Link" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="bannerType"
+            label="Banner Type"
+            rules={[{ required: true }]}
+          >
+            <Select>
+              <Option value="main">Main</Option>
+              <Option value="deals">Deals</Option>
+              <Option value="newRelease">New Release</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="isActive" label="Active" valuePropName="checked">
+            <Switch />
+          </Form.Item>
+          <Form.Item name="photo" label="Upload Media" valuePropName="file">
+            <Upload listType="picture" beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>
+                Upload{" "}
+                {form.getFieldValue("mediaType") === "video"
+                  ? "Video"
+                  : "Image"}
               </Button>
-            </Form>
-          </Card>
-        </Col>
-        <Col span={16}>
-          <Card title="All Banners" bordered={false}>
-            <Table columns={columns} dataSource={banners} rowKey="_id" />
-          </Card>
-        </Col>
-      </Row>
-    </>
+            </Upload>
+          </Form.Item>
+
+          <Button type="primary" htmlType="submit" loading={loading}>
+            {editingBanner ? "Update Banner" : "Create Banner"}
+          </Button>
+        </Form>
+      </Modal>
+    </div>
   );
 };
 
-export default UploadBanner;
+export default AllBanner;

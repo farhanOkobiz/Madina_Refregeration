@@ -1,7 +1,7 @@
 const express = require("express");
+const errorRouteMiddleware = require("../middlewares/errorRouteMiddleware");
 const baseURL = process.env.BASE_URL;
 const apiRoutes = require("./api");
-const errorRouteMiddleware = require("../middlewares/errorRouteMiddleware");
 
 const router = express.Router();
 

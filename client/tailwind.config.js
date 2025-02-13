@@ -1,69 +1,36 @@
-const { blackA, violet } = require('@radix-ui/colors');
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-
-    container: {
-      // you can configure the container to be centered
-      center: true,
-
-      // or have default horizontal padding
-      padding: {
-        DEFAULT: '1rem',
-        xs:'1rem',
-        sm: '2rem',
-        lg: '1rem',
-        xl: '1rem',
-        '2xl': '1rem',
-      },
-
-      // default breakpoints but with 40px removed
-      screens: {
-        xs:'400px',
-        sm: '640px',
-        md: '768px',
-        lg: '1024px',
-        xl: '1280px',
-        '2xl': '1440px',
-      },
-    },
     extend: {
-      fontSize: {
-        head: '30px',
-        banhead: '3.5rem',
-        parahead: '1rem',
-        para:'0.875rem',
-      },
-      maxWidth: {
-        '8xl': '1400px',
-      },
       fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
+        robo: ["Roboto", "sans-serif"], // Corrected fallback font family
       },
       colors: {
-        primary: '#FC8D0B',
-        danger: '#6d9157',
-        bancolor:'#FEF7F7',
-        textgray:'#7C6D65',
-        texthead:'#161619',
-        paracolor:'#7c6e65',
-        textgray:'#beb4b4',
-        border:'#eae8e4',
-        inputbg:'#F6F5F3',
-        bestdealbg:'#fff6f6',
-        customRed: '#6d9157',
-        ...blackA,
-        ...violet,
+        primary: "#178843",
+        secondary: "#F4A51D",
+        text: "#292929",
       },
-      backgroundImage: {
-        'banner': "url('./src/assets/banner/bgbanner.jpg')",
-      }
+      animation: {
+        "spin-slow": "spin 20s linear infinite",
+      },
+      screens: {
+        'height-900': { raw: '(max-height: 900px)' },
+        'height-600': { raw: '(max-height: 600px)' },
+      },
+    },
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+        lg: "4rem",
+        xl: "5rem",
+        "2xl": "6rem",
+      },
     },
   },
   plugins: [],
-}
+};
 
+// "Roboto", sans-serif 178843

@@ -1,6 +1,12 @@
 const express = require("express");
+const protectMiddleware = require("../../middlewares/protectMiddleware");
+const restrictToMiddleware = require("../../middlewares/restrictToMiddleware");
 const {
-  createOrderWithCouponController,
+  uploadPhotoMiddleware,
+  cloudinaryUploadMiddleware,
+} = require("../../middlewares/photoMiddleware");
+
+const {
   createOrderController,
   getAllOrdersController,
   getOrderController,
@@ -10,15 +16,21 @@ const {
 
 const router = express.Router();
 
-// With Coupons
-router.route("/withCoupon").post(createOrderWithCouponController);
-
-router.route("/").post(createOrderController).get(getAllOrdersController);
+// router.use(protectMiddleware);
 
 router
-  .route("/:id")
-  .get(getOrderController)
-  .patch(updateOrderController)
-  .delete(deleteOrderController);
+  .route("/")
+  .post(
+    uploadPhotoMiddleware(),
+    cloudinaryUploadMiddleware("order", "photo"),
+    createOrderController
+  )
+  .get(getAllOrdersController);
+
+router.get("/:id", getOrderController);
+
+// router.use(restrictToMiddleware("admin"));
+router.route("/:id").patch(updateOrderController).delete(deleteOrderController);
+
 
 module.exports = router;

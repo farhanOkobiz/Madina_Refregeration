@@ -1,20 +1,29 @@
 const mongoose = require("mongoose");
 const Order = require("../models/orderModel");
-const Option = require("../models/optionModel");
-const Coupon = require("../models/couponModel");
-const Email = require("../utils/Email");
+const Product = require("../models/productModel");
 const AppError = require("../utils/AppError");
+const Email = require("../utils/Email");
 const catchAsync = require("../utils/catchAsync");
-const { getAll, getOne, deleteOne } = require("../utils/handleFactory");
+const { deleteUploadedImages } = require("../middlewares/photoMiddleware");
+const { getAll, getOne } = require("./handleFactory");
+
+const extractPublicIdFromUrl = (url) => {
+  const parts = url.split("/");
+  const fileName = parts.pop(); // Get the file name with extension
+  const folder = parts.slice(7).join("/"); // Extract folder path
+  const publicId = `${folder}/${fileName.split(".")[0]}`; // Extract publicId without extension
+  return publicId;
+};
 
 exports.createOrderController = catchAsync(async (req, res, next) => {
-  // Aggregate the product prices
-  const productAggregation = await Option.aggregate([
+
+
+  const productAggregation = await Product.aggregate([
     {
       $match: {
         _id: {
-          $in: req.body.products.map(
-            (item) => new mongoose.Types.ObjectId(item.option)
+          $in: req.body?.products?.map(
+            (item) => new mongoose.Types.ObjectId(item.product)
           ),
         },
       },
@@ -23,186 +32,53 @@ exports.createOrderController = catchAsync(async (req, res, next) => {
       $project: {
         price: 1,
         salePrice: 1,
-        freeShipping: 1,
       },
     },
     {
       $addFields: {
-        effectivePrice: {
-          $cond: {
-            if: { $gt: ["$salePrice", 0] },
-            then: "$salePrice",
-            else: "$price",
-          },
-        },
+        effectivePrice: "$salePrice",
       },
     },
   ]);
 
-  // Calculate the total product cost
-  let isFreeShipping = false;
-
-  const productTotal = req.body.products.reduce((total, product) => {
-    const option = productAggregation.find((v) =>
-      v._id.equals(new mongoose.Types.ObjectId(product.option))
+  const productTotal = req.body.products.reduce((total, item) => {
+    const product = productAggregation.find((v) =>
+      v._id.equals(new mongoose.Types.ObjectId(item.product))
     );
 
-    if (option) {
-      if (option.freeShipping === true) isFreeShipping = true;
-
-      return total + option.effectivePrice * product.quantity;
+    if (product) {
+      return total + product.effectivePrice * item.quantity;
     }
 
     return total;
   }, 0);
 
-  // Add the shipping cost to the total
-  if (isFreeShipping) req.body.shippingCost = 0;
-  const totalCost = productTotal + req.body.shippingCost;
-
   // Create the order with the calculated total cost
   let order = await Order.create({
     ...req.body,
-    totalCost,
+    user: req?.body?.userId,
+    totalCost: productTotal,
+    paymentMethod: req.body.paymentMethod,
   });
 
   order = await Order.findById(order._id).populate({
-    path: "products.option",
-    select: "sku size price salePrice discountType discountValue",
-    populate: {
-      path: "product variant",
-      select: "name colorName colorCode",
-    },
+    path: "products.product",
+    select: "title sku size price salePrice discountType discountValue",
   });
-  // Update the sellNumber for each variant in the order
-  await Promise.all(
-    order.products.map(async (product) => {
-      console.log("this route run ---");
-      const data = await Option.findByIdAndUpdate(
-        product.option._id, // Accessing the correct ID
-        { $inc: { saleNumber: product.quantity } },
-        { new: true }
-      );
-    })
-  );
-  if (order?.email) {
-    const orderUrl = `${req.protocol}://localhost:5173/orders/${order._id}`;
-    const email = new Email(
-      { email: order?.email, name: order?.name },
-      orderUrl
-    );
+
+  if (order.email) {
+    const orderUrl = `${req.protocol}://agroinfusion.com//orders/${order._id}`;
+    const email = new Email({ email: order.email, name: order.name }, orderUrl);
     await email.sendInvoice(order);
   }
 
-  res.status(201).json({
-    status: "success",
-    message: "Order request sent successfully, Check your email inbox please",
-    data: {
-      order,
-    },
-  });
-});
-
-// WITH COUPON CODE:
-exports.createOrderWithCouponController = catchAsync(async (req, res, next) => {
-  const { coupon, products } = req.body;
-
-  if (!coupon) {
-    return next(
-      new AppError("You need to enter a coupon code to use this route", 400)
-    );
-  }
-
-  // Check if the coupon is valid
-  const couponData = await Coupon.findOne({
-    coupon,
-    isActive: true,
-    validFrom: { $lte: new Date() },
-    validUntil: { $gte: new Date() },
-  });
-
-  if (!couponData) {
-    return next(new AppError("Invalid, inactive, or expired coupon code", 400));
-  }
-
-  // Aggregate the product prices
-  const productAggregation = await Option.aggregate([
-    {
-      $match: {
-        _id: {
-          $in: products.map((item) => new mongoose.Types.ObjectId(item.option)),
-        },
-      },
-    },
-    {
-      $project: {
-        price: 1,
-        salePrice: 1,
-        freeShipping: 1,
-      },
-    },
-  ]);
-
-  // Calculate the total product cost
-  let isFreeShipping = false;
-
-  const productTotal = products.reduce((total, product) => {
-    const option = productAggregation.find((v) =>
-      v._id.equals(new mongoose.Types.ObjectId(product.option))
-    );
-
-    if (option) {
-      if (option.freeShipping === true) isFreeShipping = true;
-      return total + option.price * product.quantity;
-    }
-
-    return total;
-  }, 0);
-
-  // Calculate the discount based on the coupon
-  const couponDiscount = (productTotal * couponData.discountPercent) / 100;
-  const discountedProductTotal = productTotal - couponDiscount;
-
-  // Calculate the final total cost including shipping
-  if (isFreeShipping) req.body.shippingCost = 0;
-  const totalCost = discountedProductTotal + req.body.shippingCost;
-
-  // Create the order with the calculated total cost
-  let order = await Order.create({
-    ...req.body,
-    totalCost,
-    couponDiscount: couponDiscount,
-  });
-
-  order = await Order.findById(order._id)
-    .populate({
-      path: "products.option",
-      select: "sku size price salePrice discountType discountValue",
-      populate: {
-        path: "product variant",
-        select: "name colorName colorCode",
-      },
-    })
-    .select("-__v");
-
-  // Update the sellNumber for each option in the order
-  await Promise.all(
-    order.products.map(async (product) => {
-      await Option.findByIdAndUpdate(
-        product.option._id,
-        { $inc: { sellNumber: product.quantity } },
-        { new: true }
-      );
-    })
-  );
-
-  const orderUrl = `${req.protocol}://localhost:5173/orders/${order._id}`;
-  const email = new Email({ email: order.email, name: order.name }, orderUrl);
-  await email.sendInvoiceWithCoupon(order, couponData.discountPercent);
+  const responseMessage = order.email
+    ? "Order request sent successfully, Check your email inbox"
+    : "Order request sent successfully";
 
   res.status(201).json({
     status: "success",
-    message: "Order request sent successfully, Check your email inbox please",
+    message: responseMessage,
     data: {
       order,
     },
@@ -210,46 +86,59 @@ exports.createOrderWithCouponController = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllOrdersController = getAll(Order, {
-  path: "products.option",
-  select: "-__v",
-  populate: {
-    path: "category subCategory brand product variant",
-    select: "title name colorName colorCode",
-  },
-});
-
-exports.getOrderController = getOne(Order, {
-  path: "products.option",
-  select: "-__v",
-  populate: {
-    path: "category subCategory brand product variant",
-    select: "title name colorName colorCode",
-  },
+  path: "products.product",
+  select: "-__v -createdAt -updatedAt",
 });
 
 exports.updateOrderController = catchAsync(async (req, res, next) => {
+  const { orderStatus } = req.body;
   const order = await Order.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   })
     .populate({
-      path: "products.option",
-      select: "sku size price salePrice discountType discountValue",
-      populate: {
-        path: "product variant",
-        select: "name colorName colorCode",
-      },
+      path: "products.product",
+      select: "title sku size price salePrice discountType discountValue stock",
     })
     .select("-__v");
-
   if (!order) return next(new AppError("No order found with that ID!", 404));
 
-  const orderUrl = `${req.protocol}://localhost:5173/orders/${order._id}`;
+  const orderUrl = `${req.protocol}:${process.env.CLIENT_URL}/orders/${order._id}`;
   const email = new Email({ email: order.email, name: order.name }, orderUrl);
+  const adminEmail = process.env.EMAIL_FROM || "admin@example.com";
 
-  const { orderStatus } = req.body;
   if (["approved", "delivered", "shipped", "canceled"].includes(orderStatus)) {
     await email.sendInvoice(order);
+  }
+  // If the order is delivered, update stock and saleNumber for the products
+  if (orderStatus === "delivered") {
+    await Promise.all(
+      order.products.map(async (item) => {
+        const updatedProduct = await Product.findByIdAndUpdate(
+          item.product._id,
+          {
+            $inc: { saleNumber: item.quantity, stock: -item.quantity },
+          },
+          { new: true }
+        );
+
+        // If stock is lower than 5, send an email to the Admin
+        if (updatedProduct.stock <= 5) {
+          const stockAlertEmail = new Email({ email: adminEmail }, null);
+          await stockAlertEmail.sendStockAlert(updatedProduct);
+        }
+      })
+    );
+
+    order.paymentStatus = "paid";
+    await order.save();
+  } else if (
+    orderStatus === "approved" ||
+    orderStatus === "shipped" ||
+    orderStatus === "canceled"
+  ) {
+    order.paymentStatus = "pending";
+    await order.save();
   }
 
   res.status(200).json({
@@ -261,4 +150,27 @@ exports.updateOrderController = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteOrderController = deleteOne(Order);
+exports.getOrderController = getOne(Order, {
+  path: "products.product",
+  select: "-__v -createdAt -updatedAt",
+});
+
+exports.deleteOrderController = catchAsync(async (req, res, next) => {
+
+  const order = await Order.findById(req.params.id);
+  if (!order) return next(new AppError("Order was not found!", 404));
+
+  if (order.photo) {
+    const publicId = extractPublicIdFromUrl(order.photo);
+    const resourceType = order.mediaType || "image";
+    await deleteUploadedImages([publicId], resourceType);
+  }
+
+  await Order.findByIdAndDelete(req.params.id);
+
+  res.status(204).json({
+    status: "success",
+    message: "Order has been deleted successfully",
+    data: null,
+  });
+});

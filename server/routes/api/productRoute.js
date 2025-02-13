@@ -1,41 +1,41 @@
 const express = require("express");
+const protectMiddleware = require("../../middlewares/protectMiddleware");
+const restrictToMiddleware = require("../../middlewares/restrictToMiddleware");
 const {
   uploadPhotoMiddleware,
-  resizePhotoMiddleware,
-} = require("../../middlewares/uploadPhotoMiddleware");
+  cloudinaryUploadMiddleware,
+} = require("../../middlewares/photoMiddleware");
+
 const {
-  createProductController,
   getAllProductsController,
   getProductController,
+  createProductController,
   updateProductController,
   deleteProductController,
-  getVariantsByProduct,
-  getOptionsByProduct,
 } = require("../../controllers/productController");
 
 const router = express.Router();
 
-router
-  .route("/")
-  .post(
-    uploadPhotoMiddleware(true, 4),
-    resizePhotoMiddleware("products"),
-    createProductController
-  )
-  .get(getAllProductsController);
+router.get("/", getAllProductsController);
+router.get("/:slug", getProductController);
+
+router.use(protectMiddleware);
+router.use(restrictToMiddleware("admin"));
+
+router.post(
+  "/",
+  uploadPhotoMiddleware(true),
+  cloudinaryUploadMiddleware("product", "photos"),
+  createProductController
+);
 
 router
-  .route("/:id")
-  .get(getProductController)
+  .route("/:slug")
   .patch(
-    uploadPhotoMiddleware(true, 4),
-    resizePhotoMiddleware("products"),
+    uploadPhotoMiddleware(true),
+    cloudinaryUploadMiddleware("product", "photos"),
     updateProductController
   )
   .delete(deleteProductController);
-
-// Get all (Variants, Options) of a Product:
-router.get("/:productId/variants", getVariantsByProduct);
-router.get("/:productId/options", getOptionsByProduct);
 
 module.exports = router;

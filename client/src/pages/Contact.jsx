@@ -1,21 +1,30 @@
-import React, { useEffect } from 'react'
-import MapConatacts from '../components/contact/MapConatacts'
-import ContactInfo from '../components/contact/ContactInfo'
-import BradCumbs from '../components/bradcumbs/BradCumbs'
+/* eslint-disable no-unused-vars */
+import Containar from "../components/containar/Containar";
+import ContractForm from "../components/Contract/ContractForm";
+import ContractInfo from "../components/Contract/ContractInfo";
+import OfficeLocation from "../components/Contract/OfficeLocation";
+import SocialMediaLinks from "../components/Contract/SocialMediaLinks";
+import BradCumbs from "../components/shared/BradCumbs";
+import bdImg from "../assets/Contact/agriculture-bg.jpg";
+import { FaFacebook, FaInstagram, FaXTwitter } from "react-icons/fa6";
+import Partner from "../components/home/Partner";
+import Gallery from "../components/Contract/Gallery";
+import { useEffect } from "react";
+import api from "../components/axios/Axios";
+import { toast } from "react-toastify";
 
 const Contact = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-
   return (
-    <>
-        <BradCumbs title={"Contact Us"}/>
-        <MapConatacts/>
-        <ContactInfo/>
-    </>
-  )
-}
+    <div className="mx-auto font-robo lg:px-0">
+      <div className="h-[68px] sm:h-[89.4px] bg-primary "></div>
+      <OfficeLocation />
+      <ContractForm />
+      <ContractInfo />
+      <SocialMediaLinks />
+      <Gallery />
+      <Partner />
+    </div>
+  );
+};
 
-export default Contact
+export default Contact;

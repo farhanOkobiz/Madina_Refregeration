@@ -2,223 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+.shadow-base{
+    -webkit-box-shadow: -1px -1px 19px 2px rgba(0, 0, 0, 0.16);
+-moz-box-shadow: -1px -1px 19px 2px rgba(0, 0, 0, 0.16);
+box-shadow: -1px -1px 19px 2px rgba(0, 0, 0, 0.16);
+}
+*{
+    scroll-behavior: smooth;
+}
 
+*,
+*:before,
+*:after{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
 body{
-   font-family: "Jost", sans-serif;
+    background-color: #e5e5fa;
 }
-
-.banner-part .custom-pagination {
-    position: absolute;
-    bottom: 60px; 
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px; /* Space between pagination bullets */
-  }
-  
-@media (max-width: 768px) {
-  .banner-part .custom-pagination {
-      bottom: 30px; /* Adjusted for screens 768px or smaller */
-  }
-}
-  
-  .banner-part   .custom-pagination .swiper-pagination-bullet {
-    width: 18px;
-    height: 18px;
-    opacity: 0.5;
-    transition: opacity 0.3s;
-    position: relative;
-    cursor: pointer;
-  }
-  .banner-part  .custom-pagination .swiper-pagination-bullet::after{
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 15px;
-    height: 15px;
-    transform: translate(-50%,-50%);
-    background: black;
-  }
-  .banner-part  .custom-pagination .swiper-pagination-bullet-active::after{
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 15px;
-    height: 15px;
-    transform: translate(-50%,-50%);
-    background:#FC8D0B;
-  }
-  
-  .banner-part  .custom-pagination .swiper-pagination-bullet-active {
-    opacity: 1;
-    border: 2px solid #FC8D0B !important;
-    cursor: pointer;
-  }
-  
- /* .bestdealweek .swiper{ */
-    /* overflow: visible !important;
-  } */
-/* Custom pagination styles */
-.custom-pagination1 {
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: -80px;
-  z-index: 30;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
+.pulse {
+  height: 65px;
+  width: 65px;
+  background-color: white;
   position: absolute;
-}
-.custom-pagination1 .swiper-pagination-bullet {
-  width: 18px;
-  height: 18px;
-  border-radius: 100%;
-  opacity: 0.5;
-  transition: opacity 0.3s;
-  position: relative;
-  cursor: pointer;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  color: #e40303;
 }
 
-.custom-pagination1 .swiper-pagination-bullet::after{
-  content: '';
+.pulse:before,
+.pulse:after {
+  content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 100%;
-  transform: translate(-50%,-50%);
-  background:#454545;
-}
-.custom-pagination1 .swiper-pagination-bullet-active::after{
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-
-  border-radius: 100%;
-  transform: translate(-50%,-50%);
-  background:#161616;
-}
-
-.custom-pagination1 .swiper-pagination-bullet-active {
-  opacity: 1;
-  border: 2px solid #161616 !important;
-  cursor: pointer;
-}
-
-
-
-
-.product_Details .swiper {
-  width: 100%;
   height: 100%;
-}
-
-.product_Details .swiper-slide {
-  text-align: center;
-  font-size: 18px;
-  background: #fff;
-
-  /* Center slide text vertically */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.product_Details .swiper-slide img {
-  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
+  background-color: white;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.7;
 }
 
-.product_Details  .swiper {
-  width: 100%;
-  height: 300px;
-  margin-left: auto;
-  margin-right: auto;
+.pulse:before {
+  animation: pulse 2s ease-out infinite;
 }
 
-.product_Details .swiper-slide {
-  background-size: cover;
-  background-position: center;
+.pulse:after {
+  animation: pulse 2s 1s ease-out infinite;
 }
 
-.product_Details .mySwiper2 {
-  height: 80%;
-  width: 100%;
+@keyframes pulse {
+  100% {
+      transform: scale(1.5);
+      opacity: 0;
+  }
 }
 
-.product_Details .mySwiper {
-  height: 20%;
-  box-sizing: border-box;
-  padding: 10px 0;
+/* Responsive Styles */
+@media (max-width: 600px) { /* Adjust the max-width as needed */
+  .pulse {
+      height: 40px;  /* Smaller height for small devices */
+      width: 40px;   /* Smaller width for small devices */
+      font-size: 14px; /* Smaller font size for small devices */
+  }
 }
 
-.product_Details .mySwiper .swiper-slide {
-  width: 25%;
-  height: 100%;
-  opacity: 0.3;
-}
-
-.product_Details .mySwiper .swiper-slide-thumb-active {
-  opacity: 1;
-}
-
-.product_Details  .swiper-slide img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  cursor: pointer;
-}
-.product_Details .mySwiper2 .swiper-slide img{
- object-fit: cover !important;
-}
-.scroll-to-top {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #f75454;
-  background: #121219;
-}
-.scroll-to-top svg{
-  width: 20px;
-}
-
-.select_option button{
-  border-bottom: 1px solid #eae8e4;
-}
-/* @import "~slick-carousel/slick/slick.css";
-@import "~slick-carousel/slick/slick-theme.css"; */
-
-.default_behave ul, .default_behave ol{
-  list-style: inherit;
-  margin: 20px;
+@media (max-width: 400px) { /* Further adjustments for even smaller screens */
+  .pulse {
+      height: 30px;  /* Even smaller height */
+      width: 30px;   /* Even smaller width */
+      font-size: 12px; /* Even smaller font size */
+  }
 }
 
 
-.overflow-y-auto::-webkit-scrollbar {
-  width: 5px;
-}
 
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: #FC8D0B; 
-  border-radius: 4px; 
-}
+.custom-html-content p {
+    @apply mt-4 text-lg leading-[32px] font-robo;
+    line-height: 32px;
+  }
+  
+  .custom-html-content ul {
+    @apply list-disc list-inside mt-4;
+    padding: 0 0 0 20px;
+  }
+  
+  .custom-html-content li {
+    @apply mt-2 text-lg text-gray-600;
+  }
+  
+  .custom-html-content strong {
+    @apply font-semibold text-black;
+  }
+  
+  /* Add this to your CSS file */
+@keyframes zoom {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.3);
+    }
+  }
+  
+  .img-zoom {
+    animation: zoom 20s linear infinite; /* Apply the zoom animation */
+  }
+  
 
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: #f5e6d4; 
-  border-radius: 4px;
-}
+  @media print and (max-width: 768px) {
+    body {
+      font-size: 12px;
+    }
+    .header .logo {
+      font-size: 1.5rem;
+    }
+    .header .invoice-title {
+      font-size: 1.2rem;
+    }
+    table {
+      font-size: 10px;
+    }
+    .summary .total {
+      font-size: 1rem;
+    }
+  }

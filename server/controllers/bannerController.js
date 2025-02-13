@@ -1,87 +1,80 @@
-const fs = require("fs");
-const Banner = require("../models/bannerModel");
 const AppError = require("../utils/AppError");
+const Banner = require("../models/bannerModel");
 const catchAsync = require("../utils/catchAsync");
-const { getOne, getAll } = require("../utils/handleFactory");
+const { deleteUploadedImages } = require("../middlewares/photoMiddleware");
+const { getAll, getOne } = require("./handleFactory");
+
+const extractPublicIdFromUrl = (url) => {
+  const parts = url.split("/");
+  const fileName = parts.pop(); // Get the file name with extension
+  const folder = parts.slice(7).join("/"); // Extract folder path
+  const publicId = `${folder}/${fileName.split(".")[0]}`; // Extract publicId without extension
+  return publicId;
+};
 
 exports.createBannerController = catchAsync(async (req, res, next) => {
-  const body = req.body;
-
-  if (req.file) {
-    const { fieldname } = req.file;
-    body[fieldname] = `${req.protocol}://${req.get("host")}/uploads/banner/${
-      req.file.filename
-    }`;
-  } else {
-    delete body.photo;
-  }
-
   try {
-    const banner = await Banner.create(body);
-    if (!banner) {
-      return next(new AppError("Occured an error while creating banner", 500));
-    }
+    const banner = await Banner.create(req.body);
 
     res.status(201).json({
       status: "success",
-      message: "Banner has been added successfully",
+      message: "Banner has been created successfully",
       data: {
         banner,
       },
     });
   } catch (error) {
-    const filePath = `uploads/banner/${req.file.filename}`;
-    fs.unlink(filePath, (err) => {
-      if (err && req.file)
-        return next(
-          new AppError("Something gone wrong while creating banner", 500)
-        );
-    });
-
-    if (error.errors) {
-      const messages = Object.values(error.errors)
-        .map((item) => item.properties.message)
-        .join(", ");
-
-      return next(new AppError(`Validation failed, ${messages}.`, 400));
-    } else if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern).join(" ");
-      const capitalizeField =
-        field.charAt(0).toUpperCase() + field.slice(1).toLocaleLowerCase();
-
-      const message = `${capitalizeField} already exist, Please use another ${field}.`; // ${err.keyValue.name}
-      return next(new AppError(message, 409));
-    }
-
-    return next(
-      new AppError(`Something went wrong while creating banner`, 400)
-    );
+    const resourceType = req.body.mediaType === "video" ? "video" : "image";
+    await deleteUploadedImages([req.body.publicId], resourceType);
+    return next(error);
   }
 });
 
-exports.deleteBannerController = catchAsync(async (req, res, next) => {
-  const banner = await Banner.findByIdAndDelete(req.params.id);
-  if (!banner) {
-    return next(new AppError("No banner was found with that ID!", 404));
-  }
-
-  // PHOTO DELETING FROM SERVER:
-  const photoName = banner.photo.split("/");
-  const photoPath = `uploads/banner/${photoName[photoName.length - 1]}`;
-
-  fs.unlink(photoPath, (err) => {
-    if (err)
-      return next(
-        new AppError("Something gone wrong while deleting banner", 500)
-      );
-  });
-
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
-});
+exports.getAllBannersController = getAll(Banner);
 
 exports.getBannerController = getOne(Banner);
 
-exports.getAllBannerController = getAll(Banner);
+exports.updateBannerController = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const banner = await Banner.findById(id);
+  if (!banner) return next(new AppError("Banner was not found!", 404));
+
+  // If a new photo is uploaded, delete the old one from Cloudinary
+  if (req.body.photo && banner.photo) {
+    const oldPhotoPublicId = extractPublicIdFromUrl(banner.photo);
+    const resourceType = banner.mediaType || "image";
+    await deleteUploadedImages([oldPhotoPublicId], resourceType);
+  }
+
+  const updatedBanner = await Banner.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "Banner has been updated successfully",
+    data: {
+      banner: updatedBanner,
+    },
+  });
+});
+
+exports.deleteBannerController = catchAsync(async (req, res, next) => {
+  const banner = await Banner.findById(req.params.id);
+  if (!banner) return next(new AppError("Banner was not found!", 404));
+
+  if (banner.photo) {
+    const publicId = extractPublicIdFromUrl(banner.photo);
+    const resourceType = banner.mediaType || "image";
+    await deleteUploadedImages([publicId], resourceType);
+  }
+
+  await Banner.findByIdAndDelete(req.params.id);
+
+  res.status(204).json({
+    status: "success",
+    message: "Banner has been deleted successfully",
+    data: null,
+  });
+});

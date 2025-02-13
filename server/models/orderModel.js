@@ -1,11 +1,89 @@
+const validator = require("validator");
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
+const bankSchema = new Schema(
+  {
+    bank: {
+      type: String,
+      enum: {
+        values: ["Bank Asia", "City Bank"],
+        message: "{VALUE} is not supported, Enter a valid bank name",
+      },
+      required: [true, "Bank name is required"],
+    },
+
+    method: {
+      type: String,
+      enum: {
+        values: [
+          "TRANSFER",
+          "BEFTN",
+          "NPSB",
+          "RTGS",
+          "CASH DEPOSIT",
+          "CHEQUE DEPOSIT",
+        ],
+        message: "{VALUE} is not supported, Enter a valid method",
+      },
+      required: [true, "Transfer method is required"],
+    },
+
+    accountName: {
+      type: String,
+      required: [true, "Account name is required"],
+    },
+
+    accountNumber: {
+      type: String,
+      required: [true, "Account number is required"],
+    },
+
+    dateOfPayment: {
+      type: Date,
+      required: [true, "Payment date is required"],
+    },
+
+    chequeSubmissionDate: {
+      type: Date,
+      required: [
+        function () {
+          return this.method === "CHEQUE DEPOSIT";
+        },
+        "Cheque submission date is required",
+      ],
+    },
+
+    bankReference: {
+      type: String,
+      required: [true, "Bank reference number is required"],
+    },
+
+    promo: {
+      type: String,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const orderSchema = new Schema(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      // required: [true, "User ID is required"],
+    },
+
     name: {
       type: String,
       required: [true, "Name is required"],
+    },
+
+    email: {
+      type: String,
+      validate: [validator.isEmail, "Please provide a valid email address"],
     },
 
     phone: {
@@ -13,74 +91,29 @@ const orderSchema = new Schema(
       required: [true, "Phone number is required"],
     },
 
-    email: {
+    district: {
       type: String,
-      // required: [true, "Email is required"],
+      required: [true, "District name is required"],
     },
 
-    city: {
-      cityID: {
-        type: Number,
-        required: [true, "City ID is required"],
-      },
-
-      cityName: {
-        type: String,
-        required: [true, "City name is required"],
-      },
-    },
-
-    zone: {
-      zoneID: {
-        type: Number,
-        required: [true, "Zone ID is required"],
-      },
-
-      zoneName: {
-        type: String,
-        required: [true, "Zone name is required"],
-      },
+    upazilla: {
+      type: String,
+      required: [true, "Upazilla name is required"],
     },
 
     area: {
-      areaID: {
-        type: Number,
-        required: [true, "Area ID is required"],
-      },
+      type: String,
+      required: [true, "Area name is required"],
+    },
 
-      areaName: {
-        type: String,
-        required: [true, "Area name is required"],
-      },
+    postCode: {
+      type: String,
+      required: [true, "Post code is required"],
     },
 
     streetAddress: {
       type: String,
       required: [true, "Street address is required"],
-    },
-
-    deliveryType: {
-      type: String,
-      enum: {
-        values: ["normal", "on_demand"], // normal --> 48 Hours, on_demand --> 12 Hours
-        message: "{VALUE} is not supported, Enter a valid delivery type",
-      },
-      default: "normal",
-    },
-
-    shippingCost: {
-      type: Number,
-      required: [true, "Shipping cost is required"],
-    },
-
-    coupon: {
-      type: String,
-      default: null,
-    },
-
-    couponDiscount: {
-      type: Number,
-      default: 0,
     },
 
     totalCost: {
@@ -99,8 +132,48 @@ const orderSchema = new Schema(
 
     paymentMethod: {
       type: String,
-      enum: ["cash_on_delivery", "credit_card"],
-      default: "cash_on_delivery",
+      enum: {
+        values: ["COD", "Bank"], // SSLCommerz
+        message: "{VALUE} is not supported, Enter a valid payment method",
+      },
+      default: "COD",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: {
+        values: ["pending", "paid", "failed", "canceled"],
+        message: "{VALUE} is not supported, Enter a valid payment status",
+      },
+      default: "pending",
+    },
+
+    bankDetails: {
+      type: bankSchema,
+      required: function () {
+        return this.paymentMethod === "Bank";
+      },
+    },
+
+    photo: {
+      type: String,
+      required: [
+        function () {
+          return this.paymentMethod === "Bank";
+        },
+        "Voucher photo is required",
+      ],
+    },
+
+    transactionDetails: {
+      transactionId: String,
+      cardType: String,
+      val_id: String,
+
+      currency: {
+        type: String,
+        default: "BDT",
+      },
     },
 
     notes: {
@@ -110,9 +183,9 @@ const orderSchema = new Schema(
 
     products: [
       {
-        option: {
-          type: Schema.Types.ObjectId, // Product Option ID
-          ref: "Option",
+        product: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
           required: [true, "Product is required"],
         },
 
@@ -129,4 +202,5 @@ const orderSchema = new Schema(
 );
 
 const Order = model("Order", orderSchema);
+
 module.exports = Order;

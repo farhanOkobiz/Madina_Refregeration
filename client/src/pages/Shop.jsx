@@ -1,219 +1,225 @@
-import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
-import ProductItem from "../components/productitem/ProductItem";
-import ApiContext from "../components/baseapi/BaseApi";
-import { useSelector, useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
-import { resetColor } from "../redux/slices/colorSlice";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import SkeletonLoader from "../components/skeletonLoader/SkeletonLoader";
-import NewProductItem from "../components/productitem/NewProductItem";
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useRef, useState } from "react";
+import Containar from "../components/containar/Containar";
+import Product from "../components/home/Product";
+import BradCumbs from "../components/shared/BradCumbs";
+import HeroBanner from "../components/shop/HeroBanner";
+import Skeleton from "react-loading-skeleton"; // Import skeleton loader
+import "react-loading-skeleton/dist/skeleton.css";
+
+import { FaBangladeshiTakaSign, FaChevronRight } from "react-icons/fa6";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+
+import { FaChevronLeft, FaList } from "react-icons/fa";
+import ProductGridShopPage from "../components/shop/ProductGridShopPage";
+import api from "../components/axios/Axios";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import PriceRange from "../components/shop/PriceRange";
+import { FaFilter } from "react-icons/fa6";
 
 const Shop = () => {
-  const baseApi = useContext(ApiContext);
-  const dispatch = useDispatch();
+  const swiperRef = useRef(null);
+  const [newRelease, setNewRelease] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // State for loading
   const location = useLocation();
-  const [allProduct, setAllProduct] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const productsPerPage = 20;
-  const { minPrice, maxPrice } = useSelector((state) => state.priceRange);
-  const selectedSortOption = useSelector(
-    (state) => state.sort.selectedSortOption
-  );
-  const selectedColor = useSelector((state) => state.colors.selectedColor);
 
-  const getSortParameter = () => {
-    switch (selectedSortOption) {
-      case "popularity":
-        return "-visitCount";
-      case "low-to-high":
-        return "price";
-      case "discount":
-        return "-discount";
-      case "high-to-low":
-        return "-price";
-      case "discount-percent":
-        return "-discountPercent";
-      case "latest":
-      default:
-        return null;
-    }
-  };
+  const isCategoryPath = location.pathname.startsWith("/shop/category");
 
-  const fetchData = async () => {
-    setLoading(true);
+  const categoryName = isCategoryPath ? location.pathname.split("/").pop() : "";
+
+  const getBanners = async () => {
     try {
-      const sortParam = getSortParameter();
-      const params = {
-        "price[lt]": maxPrice,
-        "price[gt]": minPrice,
-        ...(sortParam && { sort: sortParam }),
-      };
-
-      const response = await axios.get(`${baseApi}/option`, { params });
-      const fetchedProducts = response.data.data.doc;
-
-      // Remove duplicates based on product ID
-      const uniqueProducts = [];
-      const seenProductIds = new Set();
-      fetchedProducts.forEach((item) => {
-        if (!seenProductIds.has(item.product._id)) {
-          seenProductIds.add(item.product._id);
-          uniqueProducts.push(item);
+      const response = await api.get(`/banners`);
+      const groupedBanners = response?.data?.data?.doc.reduce((acc, banner) => {
+        const { bannerType } = banner;
+        if (!acc[bannerType]) {
+          acc[bannerType] = [];
         }
-      });
-
-      // Collect all sizes for each product
-      const productsWithSizes = uniqueProducts.map((product) => {
-        const sizes = product.variant?.sizes || [];
-        return {
-          ...product,
-          sizes, // Add sizes to the product object if needed
-        };
-      });
-
-      // Filter products by selected color
-      const filteredProducts = selectedColor
-        ? productsWithSizes.filter(
-            (product) =>
-              product.variant?.colorName.toLowerCase() ===
-              selectedColor.toLowerCase()
-          )
-        : productsWithSizes;
-
-      setAllProduct(filteredProducts);
-      setTotalPages(Math.ceil(filteredProducts.length / productsPerPage)); // Calculate total pages
-      setCurrentPage(1); // Reset to first page when filtering or sorting
-    } catch (err) {
-      setError("Failed to load products. Please try again later.");
-      console.error("Error fetching products:", err);
+        acc[bannerType].push(banner);
+        return acc;
+      }, {});
+      setNewRelease(groupedBanners?.newRelease);
+      setDeals(groupedBanners?.deals);
+    } catch (error) {
+      console.error(error.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false); // Set loading to false after fetching data
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, [baseApi, minPrice, maxPrice, selectedSortOption, selectedColor]);
+    getBanners();
+  }, []);
+
+  const getCategory = async () => {
+    try {
+      const response = await api.get(`/category`);
+      setCategoryList(response.data.data.doc);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
   useEffect(() => {
-    dispatch(resetColor());
-  }, [location.pathname, dispatch]);
+    getCategory();
+  }, []);
 
-  const handlePageChange = (page) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
+  const handlePrev = () => {
+    if (swiperRef.current) {
+      swiperRef.current.swiper.slidePrev();
     }
   };
 
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(i);
+  const handleNext = () => {
+    if (swiperRef.current) {
+      swiperRef.current.swiper.slideNext();
     }
-    return pageNumbers;
   };
 
-  const paginatedProducts = allProduct.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  );
+  const lastSlug = location.pathname.split("/").pop();
 
   return (
-    <div>
-      <div className="grid grid-cols-2 gap-y-4 xl:gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
-        {loading ? (
-          <SkeletonLoader />
-        ) : error ? (
-          <div>{error}</div>
-        ) : paginatedProducts.length === 0 ? (
-          <div>No products available.</div>
-        ) : (
-          paginatedProducts.map((item) => (
-            <NewProductItem
-              key={item?.product?._id}
-              product={item}
-              image={item?.product?.photos}
-              id={item?.product?._id}
-              subtitle={item?.brand?.title}
-              title={item?.product?.name}
-              categoryId={item?.category?._id}
-              brandId={item?.brand?._id}
-              categoryName={item?.category?.title}
-              discount={item?.discountValue}
-              discountType={item?.discountType}
-              discountPercent={item?.discountPercent}
-              priceAfterDiscount={item?.salePrice}
-              offerprice={item?.price - item?.discount}
-              freeShipping={item?.freeShipping}
-              regularprice={item?.price}
-              classItem=""
-              stock={item?.stock}
-            />
-          ))
-        )}
+    <>
+      <div className="h-[68px] sm:h-[89.4px] bg-primary font-robo "></div>
+      <Containar>
+        <div className="flex gap-2 items-center py-10">
+          <Link className="font-medium" to={"/"}>
+            Home{" "}
+          </Link>
+          <FaChevronRight className="text-[12px]" />
+          <Link className="font-medium" to={"/shop"}>
+            Shop
+          </Link>
+          {isCategoryPath && (
+            <>
+              <FaChevronRight className="text-[12px]" />
+              <h3 className="capitalize">{categoryName}</h3>
+            </>
+          )}
+        </div>
+      </Containar>
+
+      <div className="py-5 md:py-8 lg:py-14 bg-[#f5f5f5]">
+        <Containar>
+          <div className="grid grid-cols-12 gap-5 lg:pb-3">
+            <div className="hidden lg:block col-span-3">
+              <div className="h-[480px]">
+                {isLoading ? (
+                  <Skeleton height={480} />
+                ) : (
+                  <HeroBanner newRelease={newRelease} />
+                )}
+              </div>
+            </div>
+            <div className="col-span-12 lg:col-span-9">
+              <div className="mb-5 lg:mb-10 relative">
+                {isLoading ? (
+                  <Skeleton height={480} />
+                ) : (
+                  <>
+                    <Swiper
+                      ref={swiperRef}
+                      modules={[Autoplay, Pagination, Navigation]}
+                      spaceBetween={30}
+                      centeredSlides={true}
+                      speed={1000}
+                      autoplay={{
+                        delay: 5000,
+                        disableOnInteraction: false,
+                      }}
+                      loop={true}
+                      pagination={{
+                        clickable: true,
+                      }}
+                      navigation={false}
+                      className="mySwiper"
+                    >
+                      {deals?.map((deal) => (
+                        <SwiperSlide key={deal._id}>
+                          <Link to={deal?.link}>
+                            <div className="relative h-60 md:h-[480px] bg-cover bg-center shadow-sm border">
+                              <img
+                                className="w-full h-full"
+                                src={deal?.photo}
+                              />
+                            </div>
+                          </Link>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                    <button
+                      onClick={handlePrev}
+                      className="absolute top-1/2 left-0 transform z-30 -translate-y-1/2 bg-primary text-white w-10 h-10 hidden lg:flex justify-center items-center"
+                    >
+                      <FaChevronLeft className="" />
+                    </button>
+                    <button
+                      onClick={handleNext}
+                      className="absolute top-1/2 right-0 transform z-30 -translate-y-1/2 w-10 h-10 bg-primary text-white hidden lg:flex justify-center items-center"
+                    >
+                      <FaChevronLeft className="rotate-180" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 gap-5">
+            <div className="col-span-3 hidden lg:block ">
+              <div className="sticky top-[88px]">
+                <div>
+                  <div className="shadow-md">
+                    <div className="w-full bg-white border-l-2 border-t border-b border-r border-l-primary">
+                      <div>
+                        <h3 className="uppercase tracking-wide text-[18px] py-3.5 px-3 font-bold">
+                          Product Category
+                        </h3>
+                      </div>
+                    </div>
+
+                    {isLoading ? (
+                      <Skeleton count={6} height={50} />
+                    ) : (
+                      categoryList.map((item, index) => (
+                        <Link
+                          to={`/shop/category/${item?.slug}`}
+                          className={`w-full ${
+                            item?.slug == lastSlug
+                              ? "bg-primary text-white"
+                              : "bg-white"
+                          }  border-l border-b border-r inline-block`}
+                          key={index}
+                        >
+                          <div>
+                            <h3 className="text-[16px] font-semibold uppercase py-3 px-3">
+                              {item?.title}
+                            </h3>
+                          </div>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <PriceRange />
+              </div>
+            </div>
+
+            <div className="col-span-12 lg:col-span-9 sm:col-span-12">
+              <div className="bg-white w-full">
+                <Outlet />
+              </div>
+            </div>
+          </div>
+        </Containar>
       </div>
-      {totalPages > 1 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          getPageNumbers={getPageNumbers}
-        />
-      )}
-    </div>
-  );
-};
-
-const PaginationControls = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  getPageNumbers,
-}) => {
-  const pageNumbers = getPageNumbers();
-
-  return (
-    <div className="flex items-center justify-center mt-28 space-x-2">
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className={`w-10 h-10 border rounded-full flex items-center justify-center  ${
-          currentPage === 1
-            ? "bg-gray-300 text-gray-500"
-            : "bg-texthead text-white hover:bg-red-500"
-        } transition-colors`}
-      >
-        <FaChevronLeft />
-      </button>
-      {pageNumbers.map((number) => (
-        <button
-          key={number}
-          onClick={() => onPageChange(number)}
-          className={`w-10 h-10 border rounded-full flex items-center justify-center ${
-            number === currentPage
-              ? "bg-red-500 text-white"
-              : "bg-white text-texthead hover:bg-red-100"
-          } transition-colors`}
-        >
-          {number}
-        </button>
-      ))}
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className={`w-10 h-10 border rounded-full flex items-center justify-center ${
-          currentPage === totalPages
-            ? "bg-gray-300 text-gray-500"
-            : "bg-texthead text-white hover:bg-red-500"
-        } transition-colors`}
-      >
-        <FaChevronRight />
-      </button>
-    </div>
+    </>
   );
 };
 
