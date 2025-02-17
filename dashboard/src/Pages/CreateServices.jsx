@@ -120,12 +120,6 @@ const Services = () => {
       render: (photo) => <Image width={100} src={photo} alt="Service" />,
     },
     {
-      title: "Icon",
-      dataIndex: "icon",
-      key: "icon",
-      render: (icon) => <div dangerouslySetInnerHTML={{ __html: icon }} />,
-    },
-    {
       title: "Heading",
       dataIndex: "heading",
       key: "heading",
@@ -213,14 +207,6 @@ const Services = () => {
             rules={[{ required: true, message: "Please input the details!" }]}
           >
             <ReactQuill />
-          </Form.Item>
-
-          <Form.Item
-            label="Icon (HTML)"
-            name="icon"
-            rules={[{ required: true, message: "Please input the icon!" }]}
-          >
-            <Input placeholder="Enter HTML icon (e.g. <i class='fa-solid fa-hippo'></i>)" />
           </Form.Item>
 
           <Form.Item label="Upload Photo">

@@ -20,12 +20,6 @@ const productSchema = new Schema(
       trim: true,
     },
 
-    size: {
-      type: String,
-      required: [true, "Size is required"],
-      trim: true,
-    },
-
     photos: [
       {
         type: String,
@@ -68,7 +62,7 @@ const productSchema = new Schema(
       type: Number,
       required: [true, "Stock number is required"],
     },
-
+    
     visitCount: {
       type: Number,
       default: 0,

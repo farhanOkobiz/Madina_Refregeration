@@ -3,17 +3,11 @@ import leaves from "../../assets/home/leaves-1-2.png";
 import leafIcon from "../../assets/home/leaf-icon3.png";
 import Containar from "../containar/Containar";
 import { IoCart } from "react-icons/io5";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { FaBangladeshiTakaSign } from "react-icons/fa6";
 import api from "../axios/Axios";
 import { addToAgroCart } from "../../redux/slices/cart/agroCartSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -22,9 +16,7 @@ const Product = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const swiperRef = useRef(null); // Reference for Swiper
   const token = useSelector((state) => state.auth.token);
 
   const handleAddtoCart = (product) => {
@@ -33,22 +25,16 @@ const Product = () => {
 
   const handleBuyNow = (product) => {
     dispatch(addToAgroCart({ ...product, quantity: 1 }));
-    // if (token) {
-    //   navigate("/checkout");
-    // } else {
-    //   navigate("/login");
-    // }
     navigate("/checkout");
   };
 
   const getProducts = async () => {
     try {
-      const response = await api.get(`/products?limit=6`);
-      setProducts(response.data?.data); // Set the product data
-      setLoading(false); // Set loading to false once data is fetched
+      const response = await api.get(`/products?limit=12`);
+      setProducts(response.data?.data);
+      setLoading(false);
     } catch (error) {
-      setError(error.message); // Handle error
-      setLoading(false); // Set loading to false if error occurs
+      setLoading(false);
     }
   };
 
@@ -56,166 +42,102 @@ const Product = () => {
     getProducts();
   }, []);
 
-  const handleNext = () => {
-    if (swiperRef.current) {
-      swiperRef.current.swiper.slideNext();
-    }
-  };
-
-  const handlePrev = () => {
-    if (swiperRef.current) {
-      swiperRef.current.swiper.slidePrev();
-    }
-  };
-
   return (
-    <div className="bg-[#FBF7F0] py-12 sm:pt-[110px] sm:pb-[130px] font-robo relative group">
-      <div className="absolute right-0 -top-24">
-        <img
-          className="w-[110px] sm:w-[210px]"
-          src={leaves}
-          alt="leaves background"
-        />
-      </div>
+    <div className="py-12 sm:py-[0px] font-robo relative">
       <Containar>
-        <div className="py-2 ">
-          <div className="text-center">
-            <div className="flex justify-center">
-              <img
-                src={leafIcon}
-                className="w-[50px] sm:w-[70px]"
-                alt="leaf-icon"
-              />
-            </div>
-            <div className="text-center mt-[10px]">
-              <h5 className="text-primary font-bold text-[16px] sm:text-xl mb-3 leading-8 sm:leading-[58px] uppercase tracking-widest">
-                Our Latest Products
-              </h5>
-              <h2 className="text-[20px] sm:text-[36px] max-w-3xl mx-auto font-semibold">
-                Explore Our Latest Products.
-              </h2>
-            </div>
-
-            <div>
-              {loading ? (
-                  <div>
-                    <Skeleton height={480} />
-                  </div>
-                ) : (
-                  <>
-                  {products?.doc?.length > 0 ? (
-                    <>
-                      <div className="relative">
-                        <Swiper
-                          ref={swiperRef}
-                          modules={[Navigation, Pagination, Autoplay]}
-                          spaceBetween={30}
-                          slidesPerView={1}
-                          loop={true}
-                          speed={1000}
-                          pagination={{ clickable: true }}
-                          autoplay={{
-                            delay: 3000,
-                            disableOnInteraction: true,
-                            pauseOnMouseEnter: true,
-                          }}
-                          breakpoints={{
-                            640: { slidesPerView: 1 },
-                            768: { slidesPerView: 2 },
-                            1024: { slidesPerView: 3 },
-                            1280: { slidesPerView: 4 },
-                          }}
-                          className="my-16 relative"
-                        >
-                          {products?.doc?.map((product) => (
-                            <SwiperSlide key={product._id}>
-                              <div className="rounded-lg overflow-hidden bg-white pb-4 group/edit">
-                                <div className="relative">
-                                  <Link to={`/shop/${product?.slug}`}>
-                                    <img
-                                      src={product?.photos[0]}
-                                      alt={product?.title || "Product Image"}
-                                      className="w-full h-[305px] rounded-none object-cover aspect-square"
-                                    />
-                                  </Link>
-    
-                                  <div className="bg-primary group-hover/edit:bg-secondary transition-all ease-linear duration-150 text-white absolute right-4 -bottom-6 rounded-full border-[6px] border-white flex justify-center items-center w-16 h-16">
-                                    <p className="text-base font-semibold text-[14px]">
-                                      {product?.size}
-                                    </p>
-                                  </div>
-                                </div>
-    
-                                <div className="text-left mt-7">
-                                  <div className="p-4">
-                                    <Link
-                                      to={`/shop/${product?.slug}`}
-                                      className="font-bold text-xl mb-2 capitalize"
-                                    >
-                                      {product?.title}
-                                    </Link>
-                                    <p className="text-gray-600 text-[16px] mt-5">
-                                      {product?.discountValue > 0 ? (
-                                        <>
-                                          <span className="line-through text-red-500 mr-2">
-                                            <FaBangladeshiTakaSign className="inline" />
-                                            {product?.price}
-                                          </span>
-                                          <span>
-                                            <FaBangladeshiTakaSign className="inline" />
-                                            {product?.salePrice}
-                                          </span>
-                                        </>
-                                      ) : (
-                                        <span>
-                                          <FaBangladeshiTakaSign className="inline" />
-                                          {product?.salePrice}
-                                        </span>
-                                      )}
-                                    </p>
-                                    <div className="flex justify-between items-center mt-5">
-                                      <button
-                                        onClick={() => handleBuyNow(product)}
-                                        className="rounded-full text-white bg-[#178843] hover:bg-secondary transition-all ease-linear duration-150 px-4 py-1 text-sm"
-                                      >
-                                        Buy Now
-                                      </button>
-                                      <button
-                                        onClick={() => handleAddtoCart(product)}
-                                        className="bg-[#178843] hover:bg-secondary transition-all ease-linear duration-150 text-white rounded-full px-1.5 py-1"
-                                      >
-                                        <IoCart className="inline w-5 h-4" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </SwiperSlide>
-                          ))}
-                        </Swiper>
-    
+        <div className="py-2 text-center">
+          <div className="flex justify-center">
+            <img
+              src={leafIcon}
+              className="w-[50px] sm:w-[70px]"
+              alt="leaf-icon"
+            />
+          </div>
+          <div className="text-center mt-[10px]">
+            <h5 className="text-primary font-bold text-[16px] sm:text-xl mb-3 uppercase tracking-widest">
+              Our Latest Products
+            </h5>
+            <h2 className="text-[20px] sm:text-[36px] max-w-3xl mx-auto font-semibold">
+              Explore Our Latest Products.
+            </h2>
+          </div>
+          <div className="mt-8">
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {[...Array(12)].map((_, index) => (
+                  <Skeleton key={index} height={300} />
+                ))}
+              </div>
+            ) : products?.doc?.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {products?.doc?.map((product) => (
+                  <div
+                    key={product._id}
+                    className="rounded-lg overflow-hidden bg-white p-4"
+                  >
+                    <Link to={`/shop/${product?.slug}`}>
+                      <img
+                        src={product?.photos[0]}
+                        alt={product?.title || "Product Image"}
+                        className="w-full h-64 object-cover"
+                      />
+                    </Link>
+                    <div className="mt-4">
+                      <Link
+                        to={`/shop/${product?.slug}`}
+                        className="font-bold text-xl capitalize"
+                      >
+                        {product?.title}
+                      </Link>
+                      <p className="text-gray-600 text-[16px] mt-3">
+                        {product?.discountValue > 0 ? (
+                          <>
+                            <span className="line-through text-red-500 mr-2">
+                              <FaBangladeshiTakaSign className="inline" />
+                              {product?.price}
+                            </span>
+                            <span>
+                              <FaBangladeshiTakaSign className="inline" />
+                              {product?.salePrice}
+                            </span>
+                          </>
+                        ) : (
+                          <span>
+                            <FaBangladeshiTakaSign className="inline" />
+                            {product?.salePrice}
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex justify-between items-center mt-4">
                         <button
-                          onClick={handlePrev}
-                          className="z-10 rounded-full p-2 absolute sm:group-hover:block hidden transition-all ease-linear duration-200 -translate-y-1/2 -left-10 top-1/2 bg-primary text-white"
+                          onClick={() => handleBuyNow(product)}
+                          className="rounded-full text-white bg-[#178843] hover:bg-secondary transition-all px-4 py-1 text-sm"
                         >
-                          <FaChevronLeft />
+                          Buy Now
                         </button>
                         <button
-                          onClick={handleNext}
-                          className="z-10 rounded-full p-2 absolute sm:group-hover:block hidden transition-all ease-linear duration-200 -translate-y-1/2 -right-10 top-1/2 bg-primary text-white"
+                          onClick={() => handleAddtoCart(product)}
+                          className="bg-[#178843] hover:bg-secondary transition-all text-white rounded-full px-1.5 py-1"
                         >
-                          <FaChevronRight />
+                          <IoCart className="inline w-5 h-4" />
                         </button>
                       </div>
-                    </>
-                  ) : (
-                    <p className="h-32 flex items-center justify-center text-2xl font-semibold text-primary">
-                      No Products Available!
-                    </p>
-                  )}
-                  </>
-                )}
-            </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="h-32 flex items-center justify-center text-2xl font-semibold text-primary">
+                No Products Available!
+              </p>
+            )}
+          </div>
+          <div className="flex justify-center mt-8">
+            <Link to="/shop">
+              <button className="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary transition-all duration-300">
+                View Shop
+              </button>
+            </Link>
           </div>
         </div>
       </Containar>

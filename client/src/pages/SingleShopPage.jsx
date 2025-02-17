@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux"; // Import useDispatch to dispatch actions
+import { useDispatch } from "react-redux";
 import SinglePageBradCumbs from "../components/shared/SinglePageBradCumbs";
 import Containar from "../components/containar/Containar";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -20,20 +20,16 @@ import BestSellProduct from "../components/shop/BestSellProduct";
 import RelatedProductItem from "../components/shop/RelatedProductItem";
 import { addToAgroCart } from "../redux/slices/cart/agroCartSlice";
 import Skeleton from "react-loading-skeleton";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const SingleShopPage = () => {
   const swiperRef = useRef(null);
-  const dispatch = useDispatch(); // Initialize dispatch hook
-  const [quantity, setQuantity] = useState(""); // Default quantity to 1
-  const [product, setProduct] = useState(null); // Ensure product is initially null
-  const [unit, setUnit] = useState("Kg");
-  const [tonChecker, setTonChecker] = useState(false);
+  const dispatch = useDispatch();
+  const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState(null);
+  const [message, setMessage] = useState(""); // State for the message
   const location = useLocation();
   const lastSlug = location.pathname.split("/").pop();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
 
   // Fetch product data on mount
   useEffect(() => {
@@ -61,114 +57,52 @@ const SingleShopPage = () => {
   };
 
   const handleQuantityChange = (e) => {
-    let value = Number(e.target.value);
+    const value = parseInt(e.target.value, 10);
     if (!isNaN(value) && value >= 0) {
-      if (unit === "Ton") {
-        setQuantity(parseFloat(value.toFixed(3))); // Limit to 3 decimals for Ton
+      if (value <= product.stock) {
+        setQuantity(value);
+        setMessage("");
       } else {
-        setQuantity(value); // No need for decimal limiting in Kg
+        setQuantity(product.stock);
+        setMessage("You have reached the maximum available stock.");
       }
-    } else if (e.target.value === "" || e.target.value === 0) {
+    } else if (e.target.value === "") {
       setQuantity("");
-      setUnit("Kg");
     }
   };
 
   const handleIncrement = () => {
-    if (unit === "Ton") {
-      setQuantity((prev) => parseFloat((prev + 0.001).toFixed(3)));
-    } else {
+    if (product && quantity < product.stock) {
       setQuantity((prev) => (prev === "" ? 1 : prev + 1));
+      setMessage("");
+    } else {
+      setMessage("You have reached the maximum available stock.");
     }
   };
 
+  // Disable the increment button when the quantity reaches the maximum stock
+  const isIncrementDisabled = product && quantity >= product.stock;
+
   const handleDecrement = () => {
-    // if (unit === "Ton" && quantity > 0.25) {
-    //   setQuantity((prev) => {
-    //     const newQuantity = parseFloat((prev - 0.001).toFixed(3));
-    //     return newQuantity;
-    //   });
-    // } else if (unit === "Ton" && quantity == 0.25) {
-    //   // setQuantity(249);
-    //   setUnit("Kg");
-    // } else if (quantity > 1) {
-    //   setQuantity((prev) => prev - 1);
-    // }
-    if (unit === "Ton") {
-      setQuantity((prev) => parseFloat((prev - 0.001).toFixed(3)));
-    }
-    else {
-      setQuantity((prev) => (prev === "" ? 1 : prev - 1));
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+      setMessage("");
     }
   };
 
   const handleBuyNow = () => {
     if (product) {
-      const adjustedQuantity = tonChecker ? quantity * 1000 : quantity;
-      if (adjustedQuantity > 0) {
-        dispatch(
-          addToAgroCart({
-            ...product,
-            quantity: adjustedQuantity,
-            unit: unit,
-            tonChecker,
-          })
-        );
-        if (token) {
-          navigate("/checkout");
-        } else {
-          navigate("/login");
-        }
-      }
+      dispatch(addToAgroCart({ ...product, quantity }));
+      navigate("/checkout");
     }
   };
 
   const handleAddToCart = () => {
     if (product) {
-      const adjustedQuantity = tonChecker ? quantity * 1000 : quantity;
-      if (adjustedQuantity > 0) {
-        dispatch(
-          addToAgroCart({
-            ...product,
-            quantity: adjustedQuantity,
-            unit: unit,
-            tonChecker,
-          })
-        );
-        setQuantity(0);
-        setUnit("Kg");
-        setTonChecker(false);
-      } else {
-        toast.error("Amount cannot be empty or 0", {
-          position: "top-right",
-          autoClose: 700,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }
+      dispatch(addToAgroCart({ ...product, quantity }));
+      setQuantity("1");
     }
   };
-
-  useEffect(() => {
-    if (quantity >= 1000 && unit === "Kg") {
-      const convertedQuantity = quantity / 1000; // Convert to Ton
-      setQuantity(parseFloat(convertedQuantity.toFixed(3))); // Ensure precision
-      setUnit("Ton");
-      setTonChecker(true);
-    } else if (unit === "Ton" && quantity <= 0.999) {
-      const convertedQuantity = quantity * 1000; // Convert back to Kg
-      setQuantity(Math.floor(convertedQuantity)); // Avoid decimals for Kg
-      setUnit("Kg");
-      setTonChecker(false);
-    }
-  }, [quantity, unit]);
-
-
-
 
   return (
     <div className="font-robo">
@@ -226,7 +160,7 @@ const SingleShopPage = () => {
                     </h2>
                     <h4 className="text-[14px] font-normal mt-5">
                       {product ? (
-                        `by Agro Infusion Ltd`
+                        `by Agro Infusion Limited`
                       ) : (
                         <Skeleton width={150} />
                       )}
@@ -257,46 +191,32 @@ const SingleShopPage = () => {
                       )}
                     </h4>
 
-                    <h4 className="mt-12">
-                      {product ? (
-                        <span className="text-[16px] border-[1px] border-primary uppercase font-semibold text-primary px-4 py-1">
-                          {product.size}
-                        </span>
-                      ) : (
-                        <Skeleton height={32} width={100} />
-                      )}
-                    </h4>
-
                     <div className="flex flex-start mt-10">
                       {product ? (
-                        <>
-                          <div className="flex items-center gap-2 border px-4">
-                            <div
-                              className="w-6 h-12 flex items-center justify-center text-[20px] cursor-pointer"
-                              onClick={handleDecrement}
-                            >
-                              <FaMinus />
-                            </div>
-                            <input
-                              className="w-36 h-12 text-center outline-none"
-                              value={quantity}
-                              onChange={handleQuantityChange}
-                              type="text"
-                              placeholder="Enter your amount"
-                            />
-                            <div
-                              className="w-6 h-12 flex items-center justify-center text-[20px] cursor-pointer"
-                              onClick={handleIncrement}
-                            >
-                              <FaPlus />
-                            </div>
+                        <div className="flex items-center gap-2 border">
+                          <div
+                            className="w-12 h-12 rounded-r-sm border-l flex items-center justify-center text-[20px] cursor-pointer"
+                            onClick={handleDecrement}
+                          >
+                            <FaMinus />
                           </div>
-                          <div className="flex items-center border px-4 ml-5">
-                            <div className="w-6 h-12 flex items-center justify-center text-[20px] cursor-pointer">
-                              {unit}
-                            </div>
+                          <input
+                            className="w-16 h-12 text-center outline-none"
+                            value={quantity}
+                            onChange={handleQuantityChange}
+                            type="text"
+                          />
+                          <div
+                            className={`w-12 h-12 rounded-l-sm border-r flex items-center justify-center text-[20px] cursor-pointer ${
+                              isIncrementDisabled
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            onClick={handleIncrement}
+                          >
+                            <FaPlus />
                           </div>
-                        </>
+                        </div>
                       ) : (
                         <div className="flex items-center gap-2 border">
                           <Skeleton height={48} width={48} />
@@ -305,6 +225,11 @@ const SingleShopPage = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* Display message */}
+                    {message && (
+                      <div className="mt-2 text-sm text-red-500">{message}</div>
+                    )}
 
                     <div className="flex justify-start items-center mt-16">
                       <div className="flex items-center gap-3">
@@ -318,7 +243,7 @@ const SingleShopPage = () => {
                             </button>
                             <button
                               className="font-medium px-6 bg-primary rounded-md text-white py-2 text-[16px] flex items-center gap-1"
-                              onClick={handleAddToCart} // Add to Cart button with dispatch
+                              onClick={handleAddToCart}
                             >
                               <span>Add to Cart</span>
                             </button>

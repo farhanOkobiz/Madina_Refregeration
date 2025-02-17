@@ -6,7 +6,7 @@ module.exports = class Email {
     this.to = user.email;
     this.firstName = user.name ? user.name.split(" ")[0] : "Admin";
     this.url = url;
-    this.from = `Agro Infusion <${process.env.EMAIL_FROM}>`;
+    this.from = `Madina Refregeration <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {
@@ -36,12 +36,12 @@ module.exports = class Email {
 
   async sendWelcome() {
     const html = `
-      <h1>Welcome to the Agro Infusion Family, ${this.firstName}!</h1>
+      <h1>Welcome to the Madina Refregeration Family, ${this.firstName}!</h1>
       <p>We are excited to have you onboard.</p>
       <p>Click <a href="${this.url}">here</a> to get verified.</p>
     `;
 
-    await this.send(html, "Welcome to the Agro Infusion Family!");
+    await this.send(html, "Welcome to the Madina Refregeration Family!");
   }
 
   async sendPasswordReset() {
@@ -52,7 +52,7 @@ module.exports = class Email {
     <p><a href="${this.url}">Reset your password</a></p>
     <p>If you did not request a password reset, please ignore this email.</p>
     <p>Thanks,</p>
-    <p>The Agro Infusion Team</p>
+    <p>The Madina Refregeration Team</p>
   `;
 
     await this.send(
@@ -133,7 +133,7 @@ module.exports = class Email {
       <p>Current stock: <strong>${product.stock}</strong></p>
       <p>Please consider restocking the product to ensure availability for future orders.</p>
       <p>Thanks,</p>
-      <p>The Agro Infusion System</p>
+      <p>The Madina Refregeration System</p>
     `;
 
     await this.send(

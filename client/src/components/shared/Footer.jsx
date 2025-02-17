@@ -19,12 +19,13 @@ const Footer = () => {
                   <img className="w-full" src={logo} />
                 </div>
                 <h2 className="text-xl text-text font-bold mb-3 mt-5">
-                  We Are Agro Infusion Ltd
+                  We Are Madina Refregeration
                 </h2>
                 <p className="text-[14px] leading-7 text-gray-600">
-                  Our Mission Is To Empower Farmers, Businesses, And Communities
-                  By Offering High-Quality Products And Services, that Drive
-                  Agricultural Efficiency And Sustainability.
+                  Our Mission Is To Provide Reliable Repair Services And
+                  High-Quality Components For ACs, Fridges, And Other
+                  Appliances, Ensuring Efficiency, Durability, And Customer
+                  Satisfaction.
                 </p>
               </div>
 
@@ -54,8 +55,7 @@ const Footer = () => {
                   <div className="col-span-12 lg:col-span-7">
                     <h2 className="text-xl font-bold my-4 lg:mt-0">Office</h2>
                     <p className="text-gray-600 text-[14px]">
-                      R.S Tower (2nd Floor), Space G-(Southeast corner
-                      room).B-34, Savar Bus Stand, Majidpur,  Savar, Dhaka.
+                      R949+M58, Main Road, Mirpur-10, Below Islami Bank 1216
                     </p>
 
                     <ul className="mt-5 flex flex-col gap-y-3">
@@ -108,7 +108,7 @@ const Footer = () => {
                 <h2 className="text-xl font-bold mb-4">Maps</h2>
                 <iframe
                   className="h-[200px] w-full border-none"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d24548.442709530453!2d90.24166469547629!3d23.848883384302226!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755eb490dba663d%3A0x674035f9196f93f6!2sAgro%20Infusion!5e0!3m2!1sen!2sbd!4v1728377757178!5m2!1sen!2sbd"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.335572216234!2d90.36538357602412!3d23.80666338661285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c0d6e33b525d%3A0xcca34d4459915998!2sMadina%20Refrigeration!5e0!3m2!1sen!2sbd!4v1739792266282!5m2!1sen!2sbd"
                   allowfullscreen=""
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
@@ -123,7 +123,7 @@ const Footer = () => {
         <Containar>
           <div className="flex justify-between flex-wrap px-5 lg:px-0 py-5 text-white">
             <p className="text-[12px] sm:text-[14px]">
-              Agro Infusion Ltd © 2024. All Rights Reserved.
+              Madina Refregeration © 2024. All Rights Reserved.
             </p>
             <a
               href="https://okobiz.com/"

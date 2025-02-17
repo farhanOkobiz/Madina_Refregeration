@@ -178,7 +178,7 @@ const OrderHistory = () => {
       <div class="billing-section">
         <div class="billing-info">
           <p><strong>COMPANY:</strong></p>
-          <p>Agro Infusion Limited</p>
+          <p>Madina Refregeration</p>
           <p>+88 01890011810</p>
           <p>info@agroinfusion.com</p>
         </div>

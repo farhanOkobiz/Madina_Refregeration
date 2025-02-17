@@ -16,10 +16,7 @@ const ContractInfo = () => {
             <div className="font-medium">
               <h2 className=" text-2xl mb-4">Address</h2>
               <p className="text-gray-500 font-light text-lg">
-                R.S Tower (2nd Floor), <br />
-                Space G-(Southeast corner room).B-34,
-                <br />
-                Savar Bus Stand, Majidpur,  Savar, Dhaka.
+                R949+M58, Main Road, Mirpur-10, Below Islami Bank 1216
               </p>
               <p className="text-gray-500 font-light text-lg">
                 Dhaka, Bangladesh
@@ -33,10 +30,10 @@ const ContractInfo = () => {
             <div className="font-medium text-wrap">
               <h2 className="text-2xl mb-4">Email</h2>
               <Link
-                to={"mailto:info@agroinfusion.com"}
+                to={"mailto:madinarefrigeration7@gmail.com"}
                 className="text-gray-500 font-light text-base md:text-lg"
               >
-                info@agroinfusion.com <br />
+                madinarefrigeration7@gmail.com <br />
               </Link>
               <Link
                 to={"mailto:support@agroinfusion.com"}

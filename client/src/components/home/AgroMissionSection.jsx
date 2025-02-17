@@ -42,7 +42,7 @@ const AgroMissionSection = () => {
                 Our Mission
               </h6>
               <h2 className="text-xl md:text-3xl lg::text-4xl font-bold w-full md:w-5/6 pt-2 text-center md:text-left">
-                Navigate the Future of Agriculture with Agro Infusion Ltd
+                Navigate the Future of Agriculture with Madina Refregeration
               </h2>
             </div>
             <div className="float-end flex flex-col items-center gap-10 -mt4 w-full md:w-2/5">

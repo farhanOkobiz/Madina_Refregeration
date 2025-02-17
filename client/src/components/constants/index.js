@@ -17,18 +17,18 @@ export const menulist = [
     title: "Shop",
     link: "/shop",
   },
-  {
-    title: "Success Story",
-    link: "/success-stories",
-  },
-  {
-    title: "Blogs",
-    link: "/blogs",
-  },
-  {
-    title: "Events",
-    link: "/events",
-  },
+  // {
+  //   title: "Success Story",
+  //   link: "/success-stories",
+  // },
+  // {
+  //   title: "Blogs",
+  //   link: "/blogs",
+  // },
+  // {
+  //   title: "Events",
+  //   link: "/events",
+  // },
   {
     title: "About",
     link: "/about",
@@ -43,40 +43,40 @@ export const socialLink = [
   {
     title: "Facebook",
     icon: FaFacebookF,
-    link: "https://www.facebook.com/agroinfusionltd ",
+    link: "https://www.facebook.com/Madinarefrigeration07 ",
     color:"#1877F2"
   },
-  {
-    title: "Youtube",
-    icon: FaYoutube,
-    link: "https://www.youtube.com/@agroinfusion",
-    color:"#C11616"
-  },
+  // {
+  //   title: "Youtube",
+  //   icon: FaYoutube,
+  //   link: "",
+  //   color:"#C11616"
+  // },
   {
     title: "Instagram",
     icon: FaInstagram,
-    link: "https://www.instagram.com/agroinfusion/",
+    link: "https://www.instagram.com/madinarefrigeration/",
     color:"#F77737"
   },
-  {
-    title: "Linkedin",
-    icon: FaLinkedin,
-    link: "https://www.linkedin.com/in/rajib-chawdhury-agroinfusion ",
-    color:"#1EA1F1"
-  },
+  // {
+  //   title: "Linkedin",
+  //   icon: FaLinkedin,
+  //   link: " ",
+  //   color:"#1EA1F1"
+  // },
 ];
 
 export const contactInfo = [
   {
     title: "Contact Number",
-    contact: "01890011810",
-    link: "tel:01890011810",
+    contact: "01841-782437",
+    link: "tel:01841782437",
     icon: FaPhoneAlt,
   },
   {
     title: "Email",
-    contact: "info@agroinfusion.com",
-    link: "mailto:info@agroinfusion.com",
+    contact: "madinarefrigeration7@gmail.com",
+    link: "mailto:madinarefrigeration7@gmail.com",
     icon: FaEnvelope,
   },
 ];
@@ -93,46 +93,46 @@ import partner6 from "../../assets/partners/clients-image-copyright-6.webp";
 export const partnerList = [
   {
     logo: partner1,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner2,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner3,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner4,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner5,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner6,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner2,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner3,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner4,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner5,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
   {
     logo: partner6,
-    name: "Agro Infusion Ltd",
+    name: "Madina Refregeration",
   },
 ];

@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import Containar from "../components/containar/Containar";
 import BradCumbs from "../components/shared/BradCumbs";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -19,63 +18,31 @@ const CartDetails = () => {
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
 
-  // Access cart items from Redux store
   let cartItems = useSelector((state) => state.agroCart);
   let cartAuth = useSelector((state) => state.auth);
+
   if (cartAuth && cartAuth?.user) {
-    // cartAuth loop  where cartAuth?.user?._id math cartAuth loop this userId
     cartItems = cartItems.filter((item) => item.userId === cartAuth?.user?._id);
   } else {
     cartItems = cartItems.filter((item) => item.userId === null);
   }
+
   const handleResetCart = () => {
     dispatch(resetAgroCart());
   };
 
-  // const handleQuantityChange = (id, newQuantity) => {
-  //   if (newQuantity > 0) {
-  //     dispatch(updateQuantity({ _id: id, quantity: newQuantity }));
-  //   }
-  // };
-
   const handleQuantityChange = (id, change) => {
-    // Find the current item
     const currentItem = cartItems.find((item) => item._id === id);
     if (!currentItem) return;
 
-    // Determine if the unit is in tons or kilograms
-    // const isTon = currentItem.quantity > 1000;
-    // console.log(isTon, "This is iston")
-
-    // Step size: 1 for tons, 0.001 for kilograms
-    const step = 1;
-
-    console.log(
-      `Item ID: ${id}, Quantity: ${currentItem.quantity}, Step: ${step}`
-    );
-
-    const newQuantity = currentItem.quantity + change * step;
-
-    // Ensure quantity is not negative
-    if (newQuantity >= 0) {
+    const newQuantity = currentItem.quantity + change;
+    if (newQuantity >= 0 && newQuantity <= currentItem.stock) {
       dispatch(updateQuantity({ _id: id, quantity: newQuantity }));
     }
   };
 
   const handleDeleteItem = (id) => {
     dispatch(deleteFromAgroCart(id));
-  };
-
-  const [couponCode, setCouponCode] = useState("");
-  const [couponDiscount, setCouponDiscount] = useState(0);
-
-  const handleCouponApply = () => {
-    // Implement coupon validation and discount calculation here
-    if (couponCode === "YOUR_COUPON_CODE") {
-      setCouponDiscount(10); // Apply a 10% discount
-    } else {
-      setCouponDiscount(0);
-    }
   };
 
   const calculateSubtotal = () => {
@@ -85,39 +52,26 @@ const CartDetails = () => {
     );
   };
 
-  const calculateDeliveryCharges = () => {
-    return 80; // Example: Fixed delivery charge of 80
-  };
-
   const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const total = subtotal - couponDiscount;
-    return total;
+    return calculateSubtotal();
   };
 
   const handleCheckout = () => {
-    // if (token) {
-    //   navigate("/checkout");
-    // } else {
-    //   navigate("/login");
-    // }
     navigate("/checkout");
   };
-
 
   return (
     <div className="font-robo pb-20">
       <div className="h-[64px] sm:h-[89.4px] bg-primary "></div>
-      <BradCumbs title="Agro Infusion Limited " brad="Cart"></BradCumbs>
+      <BradCumbs title="Madina Refregeration " brad="Cart" />
       <Containar>
         <div className="mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold my-10">Cart Details</h1>
-
           {cartItems.length === 0 ? (
             <div className="flex justify-center">
-              <div className="text-center  font-semibold my-20">
+              <div className="text-center font-semibold my-20">
                 <HiOutlineShoppingBag className="text-[220px] mx-auto" />
-                <h3 className="text-[28px] mt-10"> Your cart is empty.</h3>
+                <h3 className="text-[28px] mt-10">Your cart is empty.</h3>
                 <Link to="/shop">
                   <button className="mt-10 inline-block w-full md:w-auto text-center rounded-md text-white text-[14px] bg-[#178843] px-4 py-1">
                     Shop Again
@@ -127,15 +81,13 @@ const CartDetails = () => {
             </div>
           ) : (
             <div className="w-full flex justify-between relative flex-wrap">
-              <div className="w-full  mx-auto">
+              <div className="w-full mx-auto">
                 <div className="border rounded-xl">
                   <div className="overflow-x-auto">
                     <table className="min-w-full border border-gray-300 rounded-4xl text-gray-500">
-                      <thead className="min-w-full rounded-2xl">
-                        <tr className="rounded-4xl">
-                          <th className="px-4 py-3 text-left w-1/2 rounded-4xl">
-                            Product
-                          </th>
+                      <thead>
+                        <tr>
+                          <th className="px-4 py-3 text-left w-1/2">Product</th>
                           <th className="px-4 py-2 text-left w-1/12">Price</th>
                           <th className="px-4 py-2 text-left w-1/6">
                             Quantity
@@ -148,7 +100,7 @@ const CartDetails = () => {
                         {cartItems.map((item) => (
                           <tr
                             key={item._id}
-                            className="bg-white border border-gray-30 hover:bg-gray-100"
+                            className="bg-white border hover:bg-gray-100"
                           >
                             <td className="lg:px-4 py-2 flex items-center">
                               <img
@@ -158,15 +110,15 @@ const CartDetails = () => {
                               />
                               <Link
                                 to={`/shop/${item?.slug}`}
-                                className="pl-3 text-[12px] lg:text-[15px]  capitalize font-semibold"
+                                className="pl-3 text-[12px] lg:text-[15px] font-semibold"
                               >
                                 {item.title}
                               </Link>
                             </td>
                             <td className="px-4 py-2">{item.price}</td>
-                            <td className="px-4 py-2 ">
+                            <td className="px-4 py-2">
                               <div className="flex items-center space-x-3">
-                                <div className="flex justify-around items-center border p-2 rounded-md">
+                                <div className="flex justify-around items-center border py-2 px-5 rounded-md">
                                   <span
                                     onClick={() =>
                                       handleQuantityChange(item._id, -1)
@@ -175,33 +127,26 @@ const CartDetails = () => {
                                   >
                                     <FaMinus />
                                   </span>
-                                  <span className="text-center">
-                                    {item.quantity >= 1000
-                                      ? `${(item.quantity / 1000).toFixed(
-                                        3
-                                      )}` // Tons always show 3 decimals
-                                      : `${item.quantity % 1 === 0
-                                        ? item.quantity
-                                        : item.quantity.toFixed(3)
-                                      }`}
-                                    {/* For kilograms, show whole number unless decimal exists */}
+                                  <span className="text-center px-4">
+                                    {item.quantity}
                                   </span>
                                   <span
                                     onClick={() =>
                                       handleQuantityChange(item._id, 1)
                                     }
-                                    className="font-bold cursor-pointer"
+                                    className={`font-bold cursor-pointer ${
+                                      item.quantity >= item.stock
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                    }`}
                                   >
                                     <FaPlus />
                                   </span>
                                 </div>
-                                <div>
-                                  {item.quantity >= 1000 ? `Ton` : `Kg`}
-                                </div>
                               </div>
                             </td>
                             <td className="px-4 py-2">
-                              {(item.price * item.quantity).toFixed(2)} Tk.
+                              {item.price * item.quantity} Tk.
                             </td>
                             <td className="px-4 py-2">
                               <RiDeleteBin6Line
@@ -215,7 +160,6 @@ const CartDetails = () => {
                     </table>
                   </div>
                 </div>
-
                 <div className="flex justify-between my-5">
                   <button
                     onClick={handleResetCart}
@@ -231,7 +175,7 @@ const CartDetails = () => {
                   </button>
                 </div>
               </div>
-              <div className="w-full sm:w-[25%] mt-5 sm:mt-0 h-fit border-gray-300 sticky top-0">
+              <div className="w-full sm:w-[25%] mt-5 sm:mt-10 h-fit border-gray-300 sticky top-0">
                 <div className="w-full text-gray-500 bg-gray-100 border rounded-xl py-6">
                   <div className="w-5/6 mx-auto">
                     <h1 className="text-xl font-semibold my-5">Summary</h1>

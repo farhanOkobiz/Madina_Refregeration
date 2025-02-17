@@ -9,12 +9,6 @@ const serviceSchema = new Schema(
       trim: true,
     },
 
-    icon: {
-      type: String,
-      required: [true, "Icon is required"],
-      trim: true,
-    },
-
     heading: {
       type: String,
       required: [true, "Heading is required"],

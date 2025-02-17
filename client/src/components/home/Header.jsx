@@ -8,10 +8,10 @@ const Header = () => {
         <div className="flex items-center">
           <img
             src={logo} // Placeholder for your logo image
-            alt="Agro Solution Ltd Logo"
+            alt="Madina Refregeration Logo"
             className="h-10 mr-2"
           />
-          <h1 className="font-bold text-lg">Agro Solution Ltd</h1>
+          <h1 className="font-bold text-lg">Madina Refregeration</h1>
         </div>
 
         {/* Navigation */}

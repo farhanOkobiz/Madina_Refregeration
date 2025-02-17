@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Containar from "../containar/Containar";
 import logo from "../../assets/logo/logo.png";
-import { Link, NavLink, matchPath } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { menulist } from "../constants";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { FaUser } from "react-icons/fa";
@@ -20,21 +20,8 @@ const Navbar = () => {
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
-  let agroCart = useSelector((state) => state.agroCart);
-  let cartAuth = useSelector((state) => state.auth);
-
-
-  if (cartAuth && cartAuth?.user) {
-    // cartAuth loop  where cartAuth?.user?._id math cartAuth loop this userId
-    agroCart = agroCart.filter((item) => item.userId === cartAuth?.user?._id);
-  } else {
-    agroCart = agroCart.filter((item) => item.userId === null);
-  }
+  const agroCart = useSelector((state) => state.agroCart);
   const totalItems = agroCart.reduce((total, item) => total + item.quantity, 0);
-  const isTon = totalItems >= 1000; // Determine if total quantity exceeds 1000
-  const displayQuantity = isTon
-    ? (totalItems / 1000).toFixed(2) // Convert to Tons and format to 2 decimals
-    : totalItems;
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
@@ -57,7 +44,7 @@ const Navbar = () => {
     };
 
     fetchUserData();
-  }, [token]);
+  }, [token]); // Dependency includes token to refetch data when token changes
 
   // Add scroll event listener to update sticky state
   useEffect(() => {
@@ -80,21 +67,18 @@ const Navbar = () => {
     setShopDrawerOpen((prevState) => !prevState);
   };
 
-  const isShopPage =
-    matchPath({ path: "/shop", end: true }, location.pathname) ||
-    matchPath({ path: "/shop/:slug", end: true }, location.pathname);
-
   return (
     <nav
-      className={`transition-all duration-300 ease-in-out ${isSticky ? "bg-primary" : "bg-[rgba(0,0,0,0.11)] backdrop-blur-[3%]"
-        } z-[9999] font-robo fixed left-0 top-0 w-full`}
+      className={`transition-all duration-300 ease-in-out ${
+        isSticky ? "bg-[#9bdbb2]" : "bg-[#9bdbb2] backdrop-blur-[3%]"
+      } z-[9999] font-robo fixed left-0 top-0 w-full`}
     >
       <Containar>
-        <div className="py-4">
+        <div className="">
           <div className="flex justify-between items-center">
             <div>
-              <div className="flex gap-x-3 items-center">
-                <div className="w-[36px] sm:w-[56px]">
+              <div className="flex gap-x-5 items-center">
+                <div className="w-[36px] sm:w-[120px]">
                   <Link to={"/"}>
                     <img className="w-full" src={logo} alt="Logo" />
                   </Link>
@@ -102,14 +86,14 @@ const Navbar = () => {
                 <div>
                   <Link
                     to={"/"}
-                    className="text-[13px] md:text-[18px] xl:text-[24px] font-bold text-white"
+                    className="text-[16px] sm:text-2xl  lg:text-[24px] font-bold text-black"
                   >
-                    Agro Infusion Limited
+                    Madina Refregeration
                   </Link>
                 </div>
               </div>
             </div>
-            <div className="hidden lg:flex items-center gap-x-3 xl:gap-x-10">
+            <div className="hidden lg:flex items-center gap-x-10">
               <ul className="flex gap-x-8 items-center">
                 {menulist.map((item, index) => (
                   <li key={index}>
@@ -117,8 +101,8 @@ const Navbar = () => {
                       to={item?.link}
                       className={({ isActive }) =>
                         isActive
-                          ? "text-secondary text-[14px] xl:text-[16px] font-bold relative before:bg-secondary before:absolute before:contents-[] before:left-0 before:-bottom-3 before:w-full before:h-[2px]"
-                          : "text-white text-[14px] xl:text-[16px] relative before:bg-secondary before:absolute before:contents-[] before:right-0 before:-bottom-3 before:w-[0px] hover:before:w-full before:h-[2px] font-bold hover:text-secondary hover:before:left-0 transition-all ease-linear duration-150 before:transition-all before:ease-linear before:duration-100"
+                          ? "text-[#269E4B] text-[17px] font-bold relative before:bg-[#269E4B] before:absolute before:contents-[] before:left-0 before:-bottom-3 before:w-full before:h-[2px]"
+                          : "text-black text-[17px] relative before:bg-[#269E4B] before:absolute before:contents-[] before:right-0 before:-bottom-3 before:w-[0px] hover:before:w-full before:h-[2px] font-bold hover:text-[#269E4B] hover:before:left-0 transition-all ease-linear duration-150 before:transition-all before:ease-linear before:duration-100"
                       }
                     >
                       {item?.title}
@@ -127,20 +111,18 @@ const Navbar = () => {
                 ))}
               </ul>
               <ul className="flex items-center gap-x-3">
-                {isShopPage && (
-                  <li className="text-white text-[24px]">
-                    <Link to="/shoping-cart">
-                      <div className="flex items-center gap-x-2">
-                        <HiOutlineShoppingBag className="text-secondary" />
-                        <div className="text-sm uppercase">
-                          {displayQuantity} {isTon ? "Ton" : "Kg"}
-                        </div>
+                <li className="text-black text-[24px] ">
+                  <Link to="/shoping-cart">
+                    <div className="relative">
+                      <HiOutlineShoppingBag />
+                      <div className="absolute -left-1 -bottom-2 px-[7px] bg-[#269E4B] text-white py-0.5 text-[11px] rounded-full">
+                        {totalItems}
                       </div>
-                    </Link>
-                  </li>
-                )}
+                    </div>
+                  </Link>
+                </li>
                 {userData?.photo ? (
-                  <li className="text-white w-8 h-8 mt-1 rounded-full relative">
+                  <li className="text-black w-8 h-8 mt-1 rounded-full relative">
                     <Link
                       className="block w-full h-full rounded-full"
                       to="/profile"
@@ -153,7 +135,7 @@ const Navbar = () => {
                     </Link>
                   </li>
                 ) : (
-                  <li className="text-white text-[20px] relative">
+                  <li className="text-black text-[20px] relative">
                     <Link className="block" to="/profile">
                       <FaUser />
                     </Link>
@@ -161,20 +143,18 @@ const Navbar = () => {
                 )}
               </ul>
             </div>
-            <div className="block lg:hidden">
-              <ul className="flex items-center gap-x-2">
-                {isShopPage && (
-                  <li className="text-white text-[24px]">
-                    <Link to="/shoping-cart">
-                      <div className="flex items-center gap-x-2">
-                        <HiOutlineShoppingBag className="text-secondary" />
-                        <div className="text-sm uppercase">
-                          {displayQuantity} {isTon ? "Ton" : "Kg"}
-                        </div>
+            <div className="block lg:hidden pr-2">
+              <ul className="flex items-center gap-x-3">
+                <li className="text-white text-[24px] ">
+                  <Link to="/shoping-cart">
+                    <div className="relative">
+                      <HiOutlineShoppingBag />
+                      <div className="absolute -left-1 -bottom-2 px-[7px] bg-[#269E4B] py-0.5 text-[11px] rounded-full">
+                        {totalItems}
                       </div>
-                    </Link>
-                  </li>
-                )}
+                    </div>
+                  </Link>
+                </li>
                 {userData?.photo ? (
                   <li className="text-white w-8 h-8 rounded-full relative">
                     <Link

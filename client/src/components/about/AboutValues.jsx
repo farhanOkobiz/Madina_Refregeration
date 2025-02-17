@@ -1,147 +1,41 @@
 import { useState } from "react";
 import Containar from "../containar/Containar";
-import missionImg from "../../assets/About/mission.png";
-import visionImg from "../../assets/About/vision.png";
-
-const values = [
-  {
-    id: 1,
-    valuesType: "Expert",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC5931DU1WQFwYz0I2LQ3HKAHpicjmiWPwyg&s",
-    discription:
-      "Expertise and insightful evidence-based solutions are at the heart of everything we do. Expertise and insightful evidence-based solutions are at the heart of everything we do. Expertise and insightful evidence-based solutions are at the heart of everything we do. Expertise and insightful evidence-based solutions are at the heart of everything we do.",
-  },
-  {
-    id: 2,
-    valuesType: "Grounded",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC5931DU1WQFwYz0I2LQ3HKAHpicjmiWPwyg&s",
-    discription:
-      "Our teams and partners work closely with local communities, engaging them in every level of decision-making. Our teams and partners work closely with local communities, engaging them in every level of decision-making. Our teams and partners work closely with local communities, engaging them in every level of decision-making. Our teams and partners work closely with local communities, engaging them in every level of decision-making.",
-  },
-  {
-    id: 3,
-    valuesType: "Impactful",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC5931DU1WQFwYz0I2LQ3HKAHpicjmiWPwyg&s",
-    discription:
-      "We deliver long-lasting change for farmers, their families and their environments. We deliver long-lasting change for farmers, their families and their environments. We deliver long-lasting change for farmers, their families and their environments. We deliver long-lasting change for farmers, their families and their environments. We deliver long-lasting change for farmers, their families and their environments.",
-  },
-  {
-    id: 4,
-    valuesType: "Bold",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC5931DU1WQFwYz0I2LQ3HKAHpicjmiWPwyg&s",
-    discription:
-      "We model innovative approaches and are not afraid to challenge trategies that are failing. We model innovative approaches and are not afraid to challenge trategies that are failing. We model innovative approaches and are not afraid to challenge trategies that are failing.We model innovative approaches and are not afraid to challenge trategies that are failing.",
-  },
-];
 
 const AboutValues = () => {
-  const [value, setValue] = useState(values[0]);
-
-  const handelValues = (id) => {
-    setValue(values[id - 1]);
-  };
   return (
     <div className="bg-[#FBF7F0] md:py-12">
       <Containar>
         <div className="lg:my-16 p-4">
-          {/* <div className=""> */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 xl:gap-x-10">
-            <div className="my-6">
-              <h2 className="text-4xl font-bold mb-6 text-primary">
-                Our Mission
-              </h2>
-              <p className="w-full  leading-7 text-lg text-justify text-gray-500">
-                Our mission at Agro Infusion is to empower rural farmers in
-                Bangladesh by providing them with essential tools, knowledge,
-                and resources to improve soil health and crop yields, thereby
-                enhancing their livelihoods. Through our American Formula
-                “Growth Booster,” we promote sustainable agriculture by
-                increasing crop resilience and fortifying soil, encouraging
-                long-term success in farming. We are committed to building
-                enduring relationships with farmers based on trust, ensuring
-                they feel confident and secure using our products and services.
-                Additionally, we aim to uplift rural communities by driving
-                economic development, increasing agricultural production, and
-                supporting food security across Bangladesh. By tailoring our
-                solutions to meet the unique agricultural challenges of rural
-                areas, Agro Infusion strives to make a positive local impact,
-                creating opportunities for farmers to boost yields, improve
-                incomes, and enhance their overall quality of life.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mission Card */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition duration-300">
+              <h2 className="text-3xl font-bold mb-4 text-primary">Our Mission</h2>
+              <p className="text-lg text-gray-600 leading-7 text-justify">
+                Our mission at Madina Refrigeration is to provide top-quality repair services and durable components for ACs, 
+                fridges, and other cooling appliances, ensuring optimal performance and longevity. We are committed to delivering 
+                reliable and efficient solutions that minimize downtime and maximize customer satisfaction. Through expert craftsmanship, 
+                innovative techniques, and a customer-first approach, we strive to enhance the comfort and convenience of homes and 
+                businesses. Our goal is to contribute to a more sustainable future by promoting energy-efficient solutions, reducing 
+                waste, and extending the lifespan of essential appliances. At Madina Refrigeration, we build trust through excellence, 
+                ensuring our customers always have a dependable partner for their refrigeration needs.
               </p>
-              <div className="mt-5 md:mt-10">
-                <img src={missionImg} className="h-full w-[90%]" alt="" />
-              </div>
             </div>
-            <div className="my-6">
-              <h2 className="text-4xl font-bold mb-6 text-primary">
-                Our Vision
-              </h2>
-              <p className="w-full leading-7 text-lg text-gray-500 text-justify">
-                Our vision at Agro Infusion is to create a thriving rural
-                Bangladesh, where farmers are self-sufficient, prosperous, and
-                empowered to produce healthy, abundant crops with the support of
-                innovative soil health solutions. We aspire to become
-                Bangladesh's leading provider of agricultural solutions,
-                recognized for revolutionizing farming practices and
-                transforming the rural agricultural landscape. By contributing
-                to a sustainable and resilient food system, we aim to ensure
-                that future generations of farmers can succeed without
-                compromising the environment. As we grow, we envision setting a
-                global model for rural agricultural development, demonstrating
-                how a focused, community-driven approach can lead to sustainable
-                prosperity in developing regions.
+            
+            {/* Vision Card */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition duration-300">
+              <h2 className="text-3xl font-bold mb-4 text-primary">Our Vision</h2>
+              <p className="text-lg text-gray-600 leading-7 text-justify">
+                Our vision at Madina Refrigeration is to be the leading provider of reliable repair services and high-quality 
+                components for ACs, fridges, and other appliances in Bangladesh. We strive to ensure that homes and businesses 
+                experience uninterrupted cooling and efficiency through our expert solutions. By prioritizing innovation, quality, 
+                and customer satisfaction, we aim to set the industry standard for excellence. Our goal is to contribute to a 
+                sustainable future by extending the lifespan of appliances, reducing waste, and promoting energy-efficient 
+                solutions. As we grow, we envision becoming a trusted name in refrigeration and cooling services, delivering 
+                long-term value to our customers and communities.
               </p>
-              <div className="mt-5 md:mt-10">
-                <img src={visionImg} className="h-full w-full" alt="" />
-              </div>
             </div>
           </div>
-          {/* </div> */}
         </div>
-        {/* <div className="lg:my-16 p-4">
-          <div className="my-6">
-            <h2 className="text-4xl font-bold mb-6 text-primary">Our Values</h2>
-            <p className="w-full md:w-4/5 lg:w-3/5 leading-7 text-lg text-gray-500">
-              Global Agro Resources Incorporation is an agro-based company in
-              Bangladesh dealing various agriculture products including Sesame
-              Seeds, Sesame Oil, Peanut, Peanut Oil, Yellow Maize, Fresh
-              Potatoes, Raw Jute, Jute bags and other agriculture products as
-              well. Visit our website www.garibd.com for more information.
-            </p>
-          </div>
-          <div className="">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:basis-1/3 mx- mb-10 md:mb-0 text-left flex flex-col">
-                {values.map((value) => (
-                  <div key={value.id} onClick={() => handelValues(value.id)}>
-                    <button className="text-xl font-serif  hover:text-[#F4A51D] text-primary font-semibold">
-                      {value?.valuesType}
-                    </button>
-                    <hr className="divider border-1 my-10"></hr>
-                  </div>
-                ))}
-              </div>
-              <div className="md:basis-2/3 flex flex-col md:flex-row gap-2">
-                <div className="md:basis-1/2">
-                  <img
-                    className="h-[360px] lg:h-[440px] w-[400px] object-cover rounded-md"
-                    src={value?.img}
-                    alt=""
-                    srcSet=""
-                  />
-                </div>
-                <div className="md:basis-1/2 pt- text-left">
-                  <h2 className="text-2xl mb-3 font-semibold text-primary">
-                    {value?.valuesType}
-                  </h2>
-                  <p className="text-md leading-7 text-lg text-gray-500">
-                    {value?.discription}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
       </Containar>
     </div>
   );

@@ -188,11 +188,6 @@ const ProductGridShopPage = () => {
                         />
                       </Link>
                     </div>
-                    <div className="bg-primary group-hover:bg-secondary  transition-all ease-linear duration-150 text-white absolute right-4 -bottom-7 rounded-full border-4 border-white flex justify-center items-center w-16 h-16">
-                      <p className="text-base uppercase font-medium">
-                        {product?.size}
-                      </p>
-                    </div>
                   </div>
                   <div className="text-left px-4">
                     <h2 className="font-medium text-[20px] mt-7 mb-2 capitalize">

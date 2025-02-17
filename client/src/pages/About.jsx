@@ -13,11 +13,11 @@ const About = () => {
   return (
     <div className="font-robo lg:px-0">
       <div className="h-[68px] sm:h-[89.4px] bg-primary "></div>
-      <BradCumbs title="Know About Agro " brad="About"></BradCumbs>
+      <BradCumbs title="Know About Madina " brad="About"></BradCumbs>
       <AboutIntroduction></AboutIntroduction>
       <AboutValues></AboutValues>
-      <WhatWeDo></WhatWeDo>
-      <OurTeam></OurTeam>
+      {/* <WhatWeDo></WhatWeDo> */}
+      {/* <OurTeam></OurTeam> */}
       {/* <OurJourney></OurJourney> */}
       <Chooseus></Chooseus>
       <Partner></Partner>

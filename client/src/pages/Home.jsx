@@ -14,15 +14,17 @@ const Home = () => {
 
   return (
     <>
-      <Banner />
-      <Service />
-      <AgroMissionSection />
-      <Product />
-      <Success />
-      <Articles />
-      <HomeVideoPart />
-      <Event />
-      <Partner />
+      <div className="bg-[#FBF7F0] font-robo">
+        <Banner />
+        <Service />
+        {/* <AgroMissionSection /> */}
+        <Product />
+        {/* <Success /> */}
+        {/* <Articles /> */}
+        {/* <HomeVideoPart /> */}
+        {/* <Event /> */}
+        <Partner />
+      </div>
     </>
   );
 };

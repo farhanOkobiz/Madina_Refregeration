@@ -131,16 +131,6 @@ const Banner = () => {
                     ? bannerData[0].subTitle
                     : "Loading..."}
                 </p>
-                <div>
-                  <a
-                    href="#youtube"
-                    className="relative block pt-5 sm:mt-20 cursor-pointer"
-                  >
-                    <div className="pulse">
-                      <i className="fa-solid fa-play"></i>
-                    </div>
-                  </a>
-                </div>
 
                 <Link
                   to={"/contact-us"}

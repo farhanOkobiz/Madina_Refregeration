@@ -194,11 +194,6 @@ const Products = () => {
       key: "sku",
     },
     {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
       title: "Price",
       dataIndex: "price",
       key: "price",
@@ -267,15 +262,6 @@ const Products = () => {
             label="SKU (minimum 8 characters)"
             rules={[
               { required: true, message: "Please enter the product SKU" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="size"
-            label="Quantity"
-            rules={[
-              { required: true, message: "Please enter the product size" },
             ]}
           >
             <Input />

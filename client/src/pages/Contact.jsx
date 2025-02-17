@@ -20,9 +20,9 @@ const Contact = () => {
       <OfficeLocation />
       <ContractForm />
       <ContractInfo />
-      <SocialMediaLinks />
-      <Gallery />
-      <Partner />
+      {/* <SocialMediaLinks /> */}
+      {/* <Gallery /> */}
+      {/* <Partner /> */}
     </div>
   );
 };

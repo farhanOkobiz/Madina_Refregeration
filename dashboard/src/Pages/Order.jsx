@@ -22,8 +22,6 @@ const Orders = () => {
     details: null,
   });
 
-
-
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -43,9 +41,22 @@ const Orders = () => {
   const handleOk = async () => {
     setLoading(true);
     try {
-      await axiosInstance.patch(`/orders/${editingOrder._id}`, {
+      await axiosInstance.patch(`/orders/${editingOrder?._id}`, {
         orderStatus: editingOrder.orderStatus,
       });
+
+      if (editingOrder.orderStatus === "delivered") {
+        for (const productItem of editingOrder.products) {
+          const { product, quantity } = productItem;
+          const updatedStock = product.stock - quantity;
+
+          // Update the product stock
+          await axiosInstance.patch(`/products/${product?.slug}`, {
+            stock: updatedStock,
+          });
+        }
+      }
+
       message.success("Order status updated successfully!");
       fetchOrders();
       setIsModalOpen(false);
@@ -59,7 +70,6 @@ const Orders = () => {
   const handleDelete = async (orderId) => {
     setLoading(true);
     try {
-
       await axiosInstance.delete(`/orders/${orderId}`);
       message.success("Order deleted successfully!");
       fetchOrders();
@@ -128,7 +138,7 @@ const Orders = () => {
   //       <div class="invoice-header">
   //         <img src=${logoImage} alt="Company Logo" />
   //       <div>
-  //       <p>Agro Infusion Limited</p>
+  //       <p>Madina Refregeration</p>
   //       <p>+88 01890011810</p>
   //       </div>
   //         <h2 style="text-align: left;">Order Invoice</h2>
@@ -297,7 +307,7 @@ const Orders = () => {
               <div class="billing-section">
                 <div class="billing-info">
                   <p<strong><b>COMPANY:</b></strong></p>
-                <p>Agro Infusion Limited</p>
+                <p>Madina Refregeration</p>
                 <p>+88 01890011810</p>
                 <p>info@agroinfusion.com</p>
                 </div>
@@ -309,8 +319,9 @@ const Orders = () => {
                   <p>${order.name}</p>
                   <p>${order.phone}</p>
                   <p>${order.email}</p>
-                  <p>${order.streetAddress}, ${order.area}, ${order.upazilla
-      }, ${order.district}, ${order.postCode}</p>
+                  <p>${order.streetAddress}, ${order.area}, ${
+      order.upazilla
+    }, ${order.district}, ${order.postCode}</p>
                 </div>
                 <div class="order-info">
                   <p><strong>Invoice No.:</strong> ${order._id.slice(0, 6)}</p>
@@ -330,24 +341,26 @@ const Orders = () => {
                 </thead>
                 <tbody>
                   ${order.products
-        .map(
-          (product) => `
+                    .map(
+                      (product) => `
                       <tr>
                         <td>${product.product.title}</td>
                         <td>${product.quantity}</td>
                         <td>${product.product.salePrice} TK</td>
-                        <td>${product.quantity * product.product.salePrice
-            } TK</td>
+                        <td>${
+                          product.quantity * product.product.salePrice
+                        } TK</td>
                       </tr>
                     `
-        )
-        .join("")}
+                    )
+                    .join("")}
                 </tbody>
               </table>
     
               <div class="summary">
-                <p class="total"><strong>Grand Total:</strong> ${order.totalCost
-      } TK</p>
+                <p class="total"><strong>Grand Total:</strong> ${
+                  order.totalCost
+                } TK</p>
               </div>
     
               <div class="thank-you">
@@ -485,7 +498,11 @@ const Orders = () => {
       key: "action",
       render: (text, record) => (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <Button type="primary" onClick={() => showModal(record)}>
+          <Button
+            type="primary"
+            onClick={() => showModal(record)}
+            disabled={record.orderStatus === "delivered"} // Disable if status is "delivered"
+          >
             Edit
           </Button>
           <Button type="default" onClick={() => handlePrintInvoice(record)}>
@@ -505,6 +522,8 @@ const Orders = () => {
       ),
     },
   ];
+
+  console.log("-_-", orders);
 
   return (
     <>

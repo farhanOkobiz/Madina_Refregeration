@@ -36,13 +36,13 @@ const ContractForm = () => {
       <div className="lg:-mt-40">
         <Containar>
           <div className="w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-6  bg-white shadow rounded-2xl">
-            <div className="w-full lg:w-1/2">
+            {/* <div className="w-full lg:w-1/2">
               <div className="flex flex-col items-center justify-center rounded-lg ps-4">
                 <img src={contact} alt="" />
               </div>
-            </div>
+            </div> */}
             {/* ----------------- */}
-            <div className="flex flex-col md:flex-row items-center justify-center bg-gray-00 w-full lg:w-1/2 mx-auto ">
+            <div className="flex flex-col md:flex-row items-center justify-center bg-gray-00 w-full mx-auto ">
               <div className="bg-white p-4 md:p-8 rounded-lg w-full ">
                 <h2 className="text-6xl font-bold mb-10 text-center">
                   Get in Touch!

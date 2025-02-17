@@ -8,22 +8,22 @@ import research from "../../assets/About/Research.jpg";
 const workData = [
   {
     title: "Custom Solution",
-    description: "Agro Infusion's nutrient solutions are designed to deliver vital elements effectively from the soil to every 	part of the plant.",
+    description: "Madina Refregeration's nutrient solutions are designed to deliver vital elements effectively from the soil to every 	part of the plant.",
     image: custom,
   },
   {
     title: "Research & Developement",
-    description: "Agro Infusion is committed to advancing agricultural innovation through robust research and development efforts",
+    description: "Madina Refregeration is committed to advancing agricultural innovation through robust research and development efforts",
     image:research,
   },
   {
     title: "Case Studies and Results",
-    description: "Agro Infusion deployed its Growth Booster, a scientifically formulated nutrient solution, tailored to address soil deficiencies and promote plant vitality",
+    description: "Madina Refregeration deployed its Growth Booster, a scientifically formulated nutrient solution, tailored to address soil deficiencies and promote plant vitality",
     image: quality,
   },
   {
     title: "Quality Assurance",
-    description: "Agro Infusion prioritizes precision and trust in delivering top-tier products through a rigorous quality assurance process.",
+    description: "Madina Refregeration prioritizes precision and trust in delivering top-tier products through a rigorous quality assurance process.",
     image: casee,
   },
 ];
@@ -38,7 +38,7 @@ const WhatWeDo = () => {
           </div>
           <h4 className="text-xl font-bold text-[#F4A51D] text-center mb-10">
             Welcome to{" "}
-            <span className="text-primary">Agro Infusion Limited!</span>
+            <span className="text-primary">Madina Refregeration!</span>
           </h4>
           <h1 className="text-4xl text-center font-semibold mb-12">
             What We Do Agricultural Work

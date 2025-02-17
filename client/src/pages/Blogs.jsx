@@ -109,7 +109,7 @@ const Blogs = () => {
   return (
     <>
       <div className="h-[64px] sm:h-[89.4px] bg-primary"></div>
-      <BradCumbs title="Agro Blogs & Latest News" brad="Blog & News" />
+      <BradCumbs title="Madina Blogs & Latest News" brad="Blog & News" />
       <Containar>
         <div className="my-10 py-10 w-full">
           <div className="py-4 bg-primary px-3 sm:px-6 rounded-lg flex flex-col md:flex-row justify-between items-center">

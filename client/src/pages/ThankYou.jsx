@@ -9,7 +9,7 @@ const Thankyou = () => {
         <div className="flex flex-col items-center justify-center min-h-scree my-16">
           <div className="bg-white p-6 rounded-lg  text-center flex flex-col items-center">
             <h1 className="text-5xl text-primary font-bold mb-6 tracking-tight	">
-              Agro Infusion Limited
+              Madina Refregeration
             </h1>
             <h2 className="text-2xl font-bold">Thank you for your purchase</h2>
             {/* <p className="text-gray-700 mt-2">ORDER NO. 1265</p> */}

@@ -1,47 +1,47 @@
 import Containar from "../containar/Containar";
 import { socialLink } from "../constants/index";
 import { Link } from "react-router-dom";
-import member1 from "../../assets/About/member-1.jpg";
-import member2 from "../../assets/About/member-2.png";
-import member3 from "../../assets/About/member-3.jpg";
-import member4 from "../../assets/About/member-4.jpg";
-import member5 from "../../assets/About/member-5.jpg";
-import member6 from "../../assets/About/member-6.jpg";
+import member1 from "../../assets/About/member.jpg";
+import member2 from "../../assets/About/member.jpg";
+import member3 from "../../assets/About/member.jpg";
+import member4 from "../../assets/About/member.jpg";
+import member5 from "../../assets/About/member.jpg";
+import member6 from "../../assets/About/member.jpg";
 
 const teamMembers = [
   {
     id: 1,
-    name: "K.M. Riadh Faisal",
+    name: "Member 1",
     img: member1,
     role: "Vice Chairman",
   },
   {
     id: 2,
-    name: "Rajib Chawdhury",
+    name: "Member 2",
     img: member2,
     role: "CEO & Managing Director",
   },
   {
     id: 3,
-    name: "Md. Murad Khan",
+    name: "Member 3",
     img: member3,
     role: "Director",
   },
   {
     id: 4,
-    name: "Md. Oakil Ahmad Babul",
+    name: "Member 4",
     img: member4,
     role: "Director",
   },
   {
     id: 5,
-    name: "Mosharaf Hossan",
+    name: "Member 5",
     img: member5,
     role: "Director",
   },
   {
     id: 6,
-    name: "Md. Ashraful Islam Robin",
+    name: "Member 6",
     img: member6,
     role: "Director",
   },
@@ -53,7 +53,7 @@ const OurTeam = () => {
       <Containar>
         <div>
           <h1 className="text-4xl font-bold mb-6 text-primary">
-            Meet With Our Dream Team
+            Meet Our Team
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 mt-14">
             {teamMembers.map((member) => (

@@ -69,7 +69,7 @@ const EventPage = () => {
     <div className="font-robo">
       {/* Top Section */}
       <div className="h-[64px] sm:h-[89.4px] bg-primary"></div>
-      <BradCumbs title="Agro Events" brad="Events" />
+      <BradCumbs title="Madina Events" brad="Events" />
       <div className="py-[60px] sm:py-[100px]">
         <Containar>
           <div className=" lg:p-0">

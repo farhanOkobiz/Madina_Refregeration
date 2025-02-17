@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  // baseURL: "http://localhost:8000/api/v1/",
-  baseURL: "https://myserver.agroinfusion.com/api/v1/",
+  baseURL: "http://localhost:8000/api/v1/",
+  // baseURL: "",
 });
 
 axiosInstance.interceptors.request.use(

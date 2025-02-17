@@ -145,11 +145,6 @@ const CategoryShop = () => {
                       />
                     </Link>
                   </div>
-                  <div className="bg-primary group-hover:bg-secondary transition-all ease-linear duration-150 text-white absolute right-4 -bottom-7 rounded-full border-4 border-white flex justify-center items-center w-16 h-16">
-                    <p className="text-base uppercase font-medium">
-                      {product?.size}
-                    </p>
-                  </div>
                 </div>
                 <div className="text-left px-4">
                   <h2 className="font-medium text-[20px] mt-7 mb-2 capitalize">
@@ -237,9 +232,6 @@ const CategoryShop = () => {
                         {product?.salePrice}
                       </span>
                     )}
-                  </p>
-                  <p className="inline-block text-[14px] text-text capitalize px-3 py-0.5 mt-3 border border-primary">
-                    {product?.size}
                   </p>
                   <div className="flex items-center gap-x-2.5 mt-7">
                     <button

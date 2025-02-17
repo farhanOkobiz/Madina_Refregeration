@@ -137,7 +137,7 @@ const Card = () => {
                   </div>
 
                   {/* Title */}
-                  <h2 className="font-bold text-xl mb-2">Agro Training</h2>
+                  <h2 className="font-bold text-xl mb-2">Madina Training</h2>
 
                   {/* Description */}
                   <p className="text-gray-600 text-sm px-10">

@@ -10,23 +10,24 @@ const AboutIntroduction = () => {
           <div className="lg:w-1/2">
             <h4 className="text-xl font-bold text-[#F4A51D]">
               Welcome to{" "}
-              <span className="text-primary">Agro Infusion Limited!</span>
+              <span className="text-primary">Madina Refregeration!</span>
             </h4>
             <h1 className="text-4xl font-semibold my-4 mb-8">
               We are building a better future
             </h1>
             <p className="text-lg leading-9 text-gray-500">
-              Agro Infusion's Growth Booster is designed to revolutionize
-              farming by enriching soil health, enhancing plant vitality, and
-              improving yield quality and quantity. It empowers farmers
-              economically by increasing productivity while reducing costs,
-              supports sustainable farming practices, and fosters resilience
-              against environmental and biological challenges. The product
-              promotes food security and uplifts rural communities by ensuring
-              reliable harvests and better livelihoods. Backed by innovation and
-              scientific research, it delivers precise nutrient solutions that
-              protect natural ecosystems, conserve resources, and contribute to
-              long-term agricultural and environmental sustainability.
+              Madina Refrigeration is dedicated to delivering high-quality
+              repair services and durable components for ACs, fridges, and other
+              cooling appliances. Our solutions ensure optimal performance,
+              energy efficiency, and extended appliance lifespan, helping
+              businesses and households maintain uninterrupted cooling. By
+              leveraging advanced techniques and expert craftsmanship, we
+              minimize downtime, reduce costs, and enhance customer
+              satisfaction. Our commitment to innovation and sustainability
+              drives us to promote eco-friendly practices, reduce waste, and
+              contribute to a greener future. Through reliable service and
+              trusted expertise, we aim to be the go-to partner for all
+              refrigeration and cooling needs.
             </p>
           </div>
           <div className="relative">
@@ -34,7 +35,10 @@ const AboutIntroduction = () => {
               src={aboutHeader}
               className="h-[450px] md:h-[900px] w-full rounded-lg"
             ></img>
-            <img src={leaf1} className="hidden lg:block absolute -bottom-5 -right-4"></img>
+            <img
+              src={leaf1}
+              className="hidden lg:block absolute -bottom-5 -right-4"
+            ></img>
           </div>
         </div>
       </Containar>
