@@ -20,7 +20,15 @@ const Navbar = () => {
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
-  const agroCart = useSelector((state) => state.agroCart);
+  let agroCart = useSelector((state) => state.agroCart);
+  let cartAuth = useSelector((state) => state.auth);
+
+  if (cartAuth && cartAuth?.user) {
+    // cartAuth loop  where cartAuth?.user?._id math cartAuth loop this userId
+    agroCart = agroCart.filter((item) => item.userId === cartAuth?.user?._id);
+  } else {
+    agroCart = agroCart.filter((item) => item.userId === null);
+  }
   const totalItems = agroCart.reduce((total, item) => total + item.quantity, 0);
   const token = useSelector((state) => state.auth.token);
 
@@ -69,124 +77,121 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 ease-in-out ${
+      className={`transition-all duration-300 ease-in-out h-[68px] sm:h-[120px] ${
         isSticky ? "bg-[#9bdbb2]" : "bg-[#9bdbb2] backdrop-blur-[3%]"
       } z-[9999] font-robo fixed left-0 top-0 w-full`}
     >
       <Containar>
-        <div className="">
-          <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center">
+          <div className="flex gap-x-0 lg:gap-x-5 items-center">
+            <div className="w-[36px] sm:w-[120px]">
+              <Link to={"/"}>
+                <img className="w-full" src={logo} alt="Logo" />
+              </Link>
+            </div>
             <div>
-              <div className="flex gap-x-5 items-center">
-                <div className="w-[36px] sm:w-[120px]">
-                  <Link to={"/"}>
-                    <img className="w-full" src={logo} alt="Logo" />
-                  </Link>
-                </div>
-                <div>
-                  <Link
-                    to={"/"}
-                    className="text-[16px] sm:text-2xl  lg:text-[24px] font-bold text-black"
-                  >
-                    Madina Refregeration
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="hidden lg:flex items-center gap-x-10">
-              <ul className="flex gap-x-8 items-center">
-                {menulist.map((item, index) => (
-                  <li key={index}>
-                    <NavLink
-                      to={item?.link}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "text-[#269E4B] text-[17px] font-bold relative before:bg-[#269E4B] before:absolute before:contents-[] before:left-0 before:-bottom-3 before:w-full before:h-[2px]"
-                          : "text-black text-[17px] relative before:bg-[#269E4B] before:absolute before:contents-[] before:right-0 before:-bottom-3 before:w-[0px] hover:before:w-full before:h-[2px] font-bold hover:text-[#269E4B] hover:before:left-0 transition-all ease-linear duration-150 before:transition-all before:ease-linear before:duration-100"
-                      }
-                    >
-                      {item?.title}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-              <ul className="flex items-center gap-x-3">
-                <li className="text-black text-[24px] ">
-                  <Link to="/shoping-cart">
-                    <div className="relative">
-                      <HiOutlineShoppingBag />
-                      <div className="absolute -left-1 -bottom-2 px-[7px] bg-[#269E4B] text-white py-0.5 text-[11px] rounded-full">
-                        {totalItems}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-                {userData?.photo ? (
-                  <li className="text-black w-8 h-8 mt-1 rounded-full relative">
-                    <Link
-                      className="block w-full h-full rounded-full"
-                      to="/profile"
-                    >
-                      <img
-                        className="w-full h-full rounded-full"
-                        src={userData?.photo}
-                        alt="User"
-                      />
-                    </Link>
-                  </li>
-                ) : (
-                  <li className="text-black text-[20px] relative">
-                    <Link className="block" to="/profile">
-                      <FaUser />
-                    </Link>
-                  </li>
-                )}
-              </ul>
-            </div>
-            <div className="block lg:hidden pr-2">
-              <ul className="flex items-center gap-x-3">
-                <li className="text-white text-[24px] ">
-                  <Link to="/shoping-cart">
-                    <div className="relative">
-                      <HiOutlineShoppingBag />
-                      <div className="absolute -left-1 -bottom-2 px-[7px] bg-[#269E4B] py-0.5 text-[11px] rounded-full">
-                        {totalItems}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-                {userData?.photo ? (
-                  <li className="text-white w-8 h-8 rounded-full relative">
-                    <Link
-                      className="block w-full h-full rounded-full"
-                      to="/profile"
-                    >
-                      <img
-                        className="w-full h-full rounded-full"
-                        src={userData?.photo}
-                        alt="User"
-                      />
-                    </Link>
-                  </li>
-                ) : (
-                  <li className="text-white text-[20px] relative">
-                    <Link className="block" to="/profile">
-                      <FaUser />
-                    </Link>
-                  </li>
-                )}
-                <li className="text-white text-[20px] relative">
-                  <IoReorderThree
-                    onClick={toggleDrawer}
-                    className="block lg:hidden text-white text-3xl "
-                  />
-                </li>
-              </ul>
+              <Link
+                to={"/"}
+                className="text-[16px] sm:text-2xl  lg:text-[24px] font-bold text-black"
+              >
+                Madina Refregeration
+              </Link>
             </div>
           </div>
+          <div className="hidden lg:flex items-center gap-x-10">
+            <ul className="flex gap-x-8 items-center">
+              {menulist.map((item, index) => (
+                <li key={index}>
+                  <NavLink
+                    to={item?.link}
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-[#269E4B] text-[17px] font-bold relative before:bg-[#269E4B] before:absolute before:contents-[] before:left-0 before:-bottom-3 before:w-full before:h-[2px]"
+                        : "text-black text-[17px] relative before:bg-[#269E4B] before:absolute before:contents-[] before:right-0 before:-bottom-3 before:w-[0px] hover:before:w-full before:h-[2px] font-bold hover:text-[#269E4B] hover:before:left-0 transition-all ease-linear duration-150 before:transition-all before:ease-linear before:duration-100"
+                    }
+                  >
+                    {item?.title}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+            <ul className="flex items-center gap-x-3">
+              <li className="text-black text-[24px] ">
+                <Link to="/shoping-cart">
+                  <div className="relative">
+                    <HiOutlineShoppingBag />
+                    <div className="absolute -left-1 -bottom-2 px-[7px] bg-[#269E4B] text-white py-0.5 text-[11px] rounded-full">
+                      {totalItems}
+                    </div>
+                  </div>
+                </Link>
+              </li>
+              {userData?.photo ? (
+                <li className="text-black w-8 h-8 mt-1 rounded-full relative">
+                  <Link
+                    className="block w-full h-full rounded-full"
+                    to="/profile"
+                  >
+                    <img
+                      className="w-full h-full rounded-full"
+                      src={userData?.photo}
+                      alt="User"
+                    />
+                  </Link>
+                </li>
+              ) : (
+                <li className="text-black text-[20px] relative">
+                  <Link className="block" to="/profile">
+                    <FaUser />
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
+          <div className="block lg:hidden pr-2">
+            <ul className="flex items-center gap-x-3">
+              <li className="text-white text-[24px] ">
+                <Link to="/shoping-cart">
+                  <div className="relative">
+                    <HiOutlineShoppingBag />
+                    <div className="absolute -left-1 -bottom-2 px-[7px] bg-[#269E4B] py-0.5 text-[11px] rounded-full">
+                      {totalItems}
+                    </div>
+                  </div>
+                </Link>
+              </li>
+              {userData?.photo ? (
+                <li className="text-white w-8 h-8 rounded-full relative">
+                  <Link
+                    className="block w-full h-full rounded-full"
+                    to="/profile"
+                  >
+                    <img
+                      className="w-full h-full rounded-full"
+                      src={userData?.photo}
+                      alt="User"
+                    />
+                  </Link>
+                </li>
+              ) : (
+                <li className="text-white text-[20px] relative">
+                  <Link className="block" to="/profile">
+                    <FaUser />
+                  </Link>
+                </li>
+              )}
+              <li className="text-white text-[20px] relative">
+                <IoReorderThree
+                  onClick={toggleDrawer}
+                  className="block lg:hidden text-white text-3xl "
+                />
+              </li>
+            </ul>
+          </div>
+        </div>
 
-          {/* sm navbar */}
-          {/* <div className="relative lg:hidden">
+        {/* sm navbar */}
+        {/* <div className="relative lg:hidden">
             <div
               onClick={toggleNavbar}
               className={`fixed top-0 right-0 w-2/3 md:w-80 bg-white z-50 transform ${
@@ -217,15 +222,14 @@ const Navbar = () => {
             </div>
           </div> */}
 
-          {/* Drawer */}
-          <NavberDrawer
-            menulist={menulist}
-            isShopDrawerOpen={isShopDrawerOpen}
-            toggleDrawer={toggleDrawer}
-          ></NavberDrawer>
-          {/* Drawer */}
-          {/*  */}
-        </div>
+        {/* Drawer */}
+        <NavberDrawer
+          menulist={menulist}
+          isShopDrawerOpen={isShopDrawerOpen}
+          toggleDrawer={toggleDrawer}
+        ></NavberDrawer>
+        {/* Drawer */}
+        {/*  */}
       </Containar>
     </nav>
   );

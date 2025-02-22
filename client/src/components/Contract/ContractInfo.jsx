@@ -35,12 +35,6 @@ const ContractInfo = () => {
               >
                 madinarefrigeration7@gmail.com <br />
               </Link>
-              <Link
-                to={"mailto:support@agroinfusion.com"}
-                className="text-gray-500 font-light text-base md:text-lg text-wrap"
-              >
-                support@agroinfusion.com
-              </Link>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row md:justify-center items-start gap-5 md:w-[33%]">
@@ -53,7 +47,9 @@ const ContractInfo = () => {
                 to={"telto:01890011810"}
                 className="text-gray-500 font-light text-lg"
               >
-                +88 01890011810
+                01886-782437 (Sales) <br/>
+                01819-212186 (Service) <br/>
+                01841-782437 (WhatsApp) <br/>
               </Link>
             </div>
           </div>

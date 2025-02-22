@@ -106,7 +106,7 @@ const SingleShopPage = () => {
 
   return (
     <div className="font-robo">
-      <div className="h-[68px] sm:h-[89.4px] bg-primary"></div>
+      <div className="h-[68px] sm:h-[120px] bg-primary"></div>
       <SinglePageBradCumbs title={product?.title} />
       <Containar>
         <div className="pb-24">

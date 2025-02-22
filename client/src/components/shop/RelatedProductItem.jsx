@@ -102,10 +102,6 @@ const RelatedProductItem = ({ slug, prevProductId }) => {
                     className="w-full h-full group-hover:scale-105 transition-all ease-linear duration-150 aspect-square rounded-t-lg object-cover"
                   />
                 </Link>
-
-                <div className="bg-primary group-hover:bg-secondary transition-all ease-linear duration-150 text-white absolute right-4 -bottom-6 rounded-full border-4 border-white flex justify-center items-center w-16 h-16">
-                  <p className="text-base">{item?.size}</p>
-                </div>
               </div>
               {/* Icon and Content */}
               <div className="mt-7 text-left p-4">

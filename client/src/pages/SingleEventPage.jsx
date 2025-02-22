@@ -81,7 +81,7 @@ const SingleEventPage = () => {
 
   return (
     <div>
-      <div className="h-[68px] sm:h-[89.4px] bg-primary font-robo"></div>
+      <div className="h-[68px] sm:h-[120px] bg-primary font-robo"></div>
       <BradCumbs
         title="All Latest Events"
         brad="Latest Events"

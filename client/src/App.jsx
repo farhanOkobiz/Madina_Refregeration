@@ -36,10 +36,10 @@ import ForgotPassword from "./pages/ForgotPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import ProductGridShopPage from "./components/shop/ProductGridShopPage";
 import CategoryShop from "./components/shop/CategoryShop";
-import RegistrationChoose from "./pages/RegistrationChoose";
 import RegistrationDealer from "./pages/RegistrationDealer";
 import Forgot from "./pages/Forgot";
 import ResetPassword from "./pages/ResetPassword";
+import ServicePage from "./pages/ServicePage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -57,10 +57,14 @@ const router = createBrowserRouter(
       <Route path="/thank-you" element={<Thankyou />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/forgotpassword" element={<Forgot />} />
-      <Route path="/resetPassword/:token" element={<ResetPassword/>} />
+      <Route path="/resetPassword/:token" element={<ResetPassword />} />
       <Route path="/events" element={<EventPage />} />
       <Route path="/events/:id" element={<SingleEventPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/services" element={<ServicePage />}>
+        <Route index element={<ProductGridShopPage />} />
+        <Route path="category/:slug" element={<CategoryShop />} />
+      </Route>
       <Route path="/shop" element={<Shop />}>
         <Route index element={<ProductGridShopPage />} />
         <Route path="category/:slug" element={<CategoryShop />} />
@@ -69,7 +73,6 @@ const router = createBrowserRouter(
       <Route path="/shop/:slug" element={<SingleShopPage />} />
       <Route path="/registration-user" element={<RegistrationUser />} />
       <Route path="/registration-dealer" element={<RegistrationDealer />} />
-      <Route path="/registration-choose" element={<RegistrationChoose />} />
       <Route path="/success-stories" element={<SuccessStories />} />
       <Route path="/success-stories/:id" element={<SingleStoryPage />} />
 

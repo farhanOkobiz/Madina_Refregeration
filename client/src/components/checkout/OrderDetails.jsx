@@ -54,7 +54,7 @@ const OrderDetails = ({ isAgree, setIsAgree, handleToggle, openIndex, bankDetail
                 <span className="font-bold">
                   {product.quantity >= 1000
                     ? `${(product.quantity / 1000).toFixed(3)} Ton` // Divide by 1000 and show as "Ton"
-                    : `${product.quantity % 1 === 0 ? product.quantity : product.quantity.toFixed(3)} Kg`} {/* Display "Kg" for smaller values */}
+                    : `${product.quantity % 1 === 0 ? product.quantity : product.quantity.toFixed(3)}`} {/* Display "Kg" for smaller values */}
                 </span>
               </span>
 

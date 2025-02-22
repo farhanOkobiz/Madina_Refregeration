@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 const Contact = () => {
   return (
     <div className="mx-auto font-robo lg:px-0">
-      <div className="h-[68px] sm:h-[89.4px] bg-primary "></div>
+      <div className="h-[68px] sm:h-[120px] bg-primary "></div>
       <OfficeLocation />
       <ContractForm />
       <ContractInfo />

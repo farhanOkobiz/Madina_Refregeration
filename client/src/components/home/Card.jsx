@@ -3,7 +3,7 @@ import service1 from "../../assets/service-1.png";
 import service2 from "../../assets/service-4 1.png";
 import service3 from "../../assets/service-3.png";
 import service4 from "../../assets/service-4.png";
-import leafIcon from "../../assets/leaf-icon.png";
+// import leafIcon from "../../assets/leaf-icon.png";
 import Containar from "../containar/Containar";
 import { PiTractorFill } from "react-icons/pi";
 import { GiChicken } from "react-icons/gi";
@@ -15,7 +15,7 @@ const Card = () => {
         <div className="py-[105px]">
           <div className="text-center">
             <div className="flex justify-center">
-              <img src={leafIcon} alt="leaf-icon" />
+              {/* <img src={leafIcon} alt="leaf-icon" /> */}
             </div>
             <div className="text-center my-7 ">
               <h5 className="text-[21px] font-semibold mb-4 uppercase">

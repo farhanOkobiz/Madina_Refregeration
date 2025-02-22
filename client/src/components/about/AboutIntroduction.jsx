@@ -1,12 +1,12 @@
 import farmer1 from "../../assets/About/farmer-1.jpg";
-import aboutHeader from "../../assets/About/about_header.png";
+import aboutHeader from "../../assets/About/about_header.jpeg";
 import leaf1 from "../../assets/About/Leaf-1.svg";
 import Containar from "../containar/Containar";
 const AboutIntroduction = () => {
   return (
     <div>
       <Containar>
-        <div className="my-24 w-full flex flex-col  lg:flex-row justify-between items-center md:gap-10">
+        <div className="my-24 w-full flex flex-col lg:flex-row justify-between items-center md:gap-10 gap-y-10">
           <div className="lg:w-1/2">
             <h4 className="text-xl font-bold text-[#F4A51D]">
               Welcome to{" "}
@@ -15,7 +15,7 @@ const AboutIntroduction = () => {
             <h1 className="text-4xl font-semibold my-4 mb-8">
               We are building a better future
             </h1>
-            <p className="text-lg leading-9 text-gray-500">
+            <p className="text-lg leading-9 text-gray-500 text-justify">
               Madina Refrigeration is dedicated to delivering high-quality
               repair services and durable components for ACs, fridges, and other
               cooling appliances. Our solutions ensure optimal performance,
@@ -30,14 +30,10 @@ const AboutIntroduction = () => {
               refrigeration and cooling needs.
             </p>
           </div>
-          <div className="relative">
+          <div className="lg:w-1/2 flex justify-center">
             <img
               src={aboutHeader}
-              className="h-[450px] md:h-[900px] w-full rounded-lg"
-            ></img>
-            <img
-              src={leaf1}
-              className="hidden lg:block absolute -bottom-5 -right-4"
+              className="lg:h-[450px] lg:w-[450px] rounded-lg"
             ></img>
           </div>
         </div>

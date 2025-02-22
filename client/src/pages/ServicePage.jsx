@@ -21,7 +21,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import PriceRange from "../components/shop/PriceRange";
 import { FaFilter } from "react-icons/fa6";
 
-const Shop = () => {
+const Servicepage = () => {
   const swiperRef = useRef(null);
   const [newRelease, setNewRelease] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
@@ -94,7 +94,7 @@ const Shop = () => {
           </Link>
           <FaChevronRight className="text-[12px]" />
           <Link className="font-medium" to={"/shop"}>
-            Shop
+            Service
           </Link>
           {isCategoryPath && (
             <>
@@ -107,69 +107,6 @@ const Shop = () => {
 
       <div className="py-5 md:py-8 lg:py-14 bg-[#f5f5f5]">
         <Containar>
-          <div className="grid grid-cols-12 gap-5 lg:pb-3">
-            <div className="hidden lg:block col-span-3">
-              <div className="h-[480px]">
-                {isLoading ? (
-                  <Skeleton height={480} />
-                ) : (
-                  <HeroBanner newRelease={newRelease} />
-                )}
-              </div>
-            </div>
-            <div className="col-span-12 lg:col-span-9">
-              <div className="mb-5 lg:mb-10 relative">
-                {isLoading ? (
-                  <Skeleton height={480} />
-                ) : (
-                  <>
-                    <Swiper
-                      ref={swiperRef}
-                      modules={[Autoplay, Pagination, Navigation]}
-                      spaceBetween={30}
-                      centeredSlides={true}
-                      speed={1000}
-                      autoplay={{
-                        delay: 5000,
-                        disableOnInteraction: false,
-                      }}
-                      loop={true}
-                      pagination={{
-                        clickable: true,
-                      }}
-                      navigation={false}
-                      className="mySwiper"
-                    >
-                      {deals?.map((deal) => (
-                        <SwiperSlide key={deal._id}>
-                          <Link to={deal?.link}>
-                            <div className="relative h-60 md:h-[480px] bg-cover bg-center shadow-sm border">
-                              <img
-                                className="w-full h-full"
-                                src={deal?.photo}
-                              />
-                            </div>
-                          </Link>
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                    <button
-                      onClick={handlePrev}
-                      className="absolute top-1/2 left-0 transform z-30 -translate-y-1/2 bg-primary text-white w-10 h-10 hidden lg:flex justify-center items-center"
-                    >
-                      <FaChevronLeft className="" />
-                    </button>
-                    <button
-                      onClick={handleNext}
-                      className="absolute top-1/2 right-0 transform z-30 -translate-y-1/2 w-10 h-10 bg-primary text-white hidden lg:flex justify-center items-center"
-                    >
-                      <FaChevronLeft className="rotate-180" />
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
 
           <div className="grid grid-cols-12 gap-5">
             <div className="col-span-3 hidden lg:block ">
@@ -179,7 +116,7 @@ const Shop = () => {
                     <div className="w-full bg-white border-l-2 border-t border-b border-r border-l-primary">
                       <div>
                         <h3 className="uppercase tracking-wide text-[18px] py-3.5 px-3 font-bold">
-                          Product Category
+                          All Services
                         </h3>
                       </div>
                     </div>
@@ -207,7 +144,6 @@ const Shop = () => {
                     )}
                   </div>
                 </div>
-                <PriceRange />
               </div>
             </div>
 
@@ -223,4 +159,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default Servicepage;

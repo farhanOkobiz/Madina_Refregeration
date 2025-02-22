@@ -110,15 +110,15 @@ const MainLayout = () => {
       content = <AllProduct />;
       break;
 
-    case "6":
-      content = <CreateBlog />;
-      break;
-    case "7":
-      content = <AllBlog />;
-      break;
-    case "8":
-      content = <CreateStories />;
-      break;
+    // case "6":
+    //   content = <CreateBlog />;
+    //   break;
+    // case "7":
+    //   content = <AllBlog />;
+    //   break;
+    // case "8":
+    //   content = <CreateStories />;
+    //   break;
     case "9":
       content = <AllStories />;
       break;
@@ -128,9 +128,9 @@ const MainLayout = () => {
     case "11":
       content = <AllServices />;
       break;
-    case "12":
-      content = <CreateEvents />;
-      break;
+    // case "12":
+    //   content = <CreateEvents />;
+    //   break;
     case "13":
       content = <AllEvents />;
       break;
@@ -165,15 +165,15 @@ const MainLayout = () => {
     getItem(" Category", "3", <BiCategory />),
     getItem(" Product", "4", <UploadOutlined />),
 
-    getItem("Blog", "sub2", <FaBlogger />, [
-      getItem("Create Category", "6"),
-      getItem("All Blog", "7"),
-    ]),
-    getItem(" Stories", "8", <LiaHistorySolid />),
+    // getItem("Blog", "sub2", <FaBlogger />, [
+    //   getItem("Create Category", "6"),
+    //   getItem("All Blog", "7"),
+    // ]),
+    // getItem(" Stories", "8", <LiaHistorySolid />),
 
     getItem(" Services", "10", <RiCustomerService2Line />),
 
-    getItem(" Events", "12", <MdEmojiEvents />),
+    // getItem(" Events", "12", <MdEmojiEvents />),
 
     getItem(" Partners", "14", <FaUserFriends />),
     getItem("All Contact", "16", <MdContacts />),

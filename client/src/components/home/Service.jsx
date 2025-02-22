@@ -1,12 +1,9 @@
-import service1 from "../../assets/service-1.png";
-import service2 from "../../assets/service-4 1.png";
-import service3 from "../../assets/service-3.png";
-import service4 from "../../assets/service-4.png";
-import leafIcon from "../../assets/home/leaf-icon3.png";
+import icon from "../../assets/home/service_icon.jpg";
 import Containar from "../containar/Containar";
 import { useEffect, useState } from "react";
 import api from "../axios/Axios";
 import Skeleton from "react-loading-skeleton";
+import { Link } from "react-router-dom";
 
 const Service = () => {
   const [services, setServices] = useState([]);
@@ -46,7 +43,7 @@ const Service = () => {
         <div className="py-[60px] sm:py-[80px]">
           <div className="text-center relative">
             <div className="flex justify-center">
-              <img className="w-[70px]" src={leafIcon} alt="leaf-icon" />
+              <img className="w-[70px] h-[70px]" src={icon} alt="leaf-icon" />
             </div>
             <div className="text-center my-7">
               <h5 className="text-[16px] sm:text-[21px] font-semibold mb-4 uppercase text-primary">
@@ -120,12 +117,14 @@ const Service = () => {
 
                 {/* Show All Button */}
                 <div className="flex justify-center mt-8">
-                  <button
-                    onClick={toggleShowAll}
-                    className="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary transition-all duration-300"
-                  >
-                    Show All Services
-                  </button>
+                  <Link to="/services">
+                    <div
+                      onClick={toggleShowAll}
+                      className="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary transition-all duration-300"
+                    >
+                      Show All Services
+                    </div>
+                  </Link>
                 </div>
               </>
             )}

@@ -14,6 +14,10 @@ export const menulist = [
     link: "/",
   },
   {
+    title: "Services",
+    link: "/services",
+  },
+  {
     title: "Shop",
     link: "/shop",
   },

@@ -15,7 +15,6 @@ const RootLayout = () => {
     "/login",
     "/registration-user",
     "/registration-dealer",
-    "/registration-choose",
     "/forgot-password",
     "/verify",
   ].includes(location?.pathname);

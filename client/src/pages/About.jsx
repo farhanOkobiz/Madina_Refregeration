@@ -12,7 +12,7 @@ import BradCumbs from "../components/shared/BradCumbs";
 const About = () => {
   return (
     <div className="font-robo lg:px-0">
-      <div className="h-[68px] sm:h-[89.4px] bg-primary "></div>
+      <div className="h-[68px] sm:h-[120px] bg-primary "></div>
       <BradCumbs title="Know About Madina " brad="About"></BradCumbs>
       <AboutIntroduction></AboutIntroduction>
       <AboutValues></AboutValues>

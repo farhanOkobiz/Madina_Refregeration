@@ -143,7 +143,7 @@ const UserProfile = () => {
 
   return (
     <div className="bg-[#E2E7EF]">
-      <div className="h-[68px] sm:h-[89.4px] bg-primary"></div>
+      <div className="h-[68px] sm:h-[120px] bg-primary"></div>
       {/* <ToastContainer />  */}
       <div className="py-10">
         <Containar>

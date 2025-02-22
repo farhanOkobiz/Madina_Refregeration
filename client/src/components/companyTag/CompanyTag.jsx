@@ -17,8 +17,8 @@ const CompanyTag = () => {
             Madina Refregeration
           </h2>
           <p className="text-xl font-normal text-white mt-10 leading-[38px]">
-            Essential Products for Every Farmer's Need: Your Trusted Source for
-            Quality and Innovation in Agriculture.
+            Reliable Cooling Solutions: Your Trusted Source for Quality,
+            Innovation, and Long-Lasting Refrigeration Services.
           </p>
         </div>
         <div className="flex justify-center items-center mt-10">

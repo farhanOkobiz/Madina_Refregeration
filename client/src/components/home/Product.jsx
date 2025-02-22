@@ -1,6 +1,4 @@
-import product1 from "../../assets/product-1.png";
-import leaves from "../../assets/home/leaves-1-2.png";
-import leafIcon from "../../assets/home/leaf-icon3.png";
+import icon from "../../assets/home/product_icon.png";
 import Containar from "../containar/Containar";
 import { IoCart } from "react-icons/io5";
 import { useEffect, useState } from "react";
@@ -48,8 +46,8 @@ const Product = () => {
         <div className="py-2 text-center">
           <div className="flex justify-center">
             <img
-              src={leafIcon}
-              className="w-[50px] sm:w-[70px]"
+              src={icon}
+              className="w-[70px] h-[70px]"
               alt="leaf-icon"
             />
           </div>
@@ -108,7 +106,7 @@ const Product = () => {
                           </span>
                         )}
                       </p>
-                      <div className="flex justify-between items-center mt-4">
+                      <div className="flex justify-between items-center mt-4 w-[80%] mx-auto">
                         <button
                           onClick={() => handleBuyNow(product)}
                           className="rounded-full text-white bg-[#178843] hover:bg-secondary transition-all px-4 py-1 text-sm"
